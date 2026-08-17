@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                 String   @id @default(uuid())
+  name               String
+  email              String   @unique
+  password           String
+
+  organization_users OrganizationUser[]
+  issueUsers         IssueUser[]
+  comments           Comment[]
+}
+
+model Organization {
+  id                 String   @id @default(uuid())
+  name               String
+  description        String
+
+  organization_users OrganizationUser[]
+  boards             Board[]
+}
+
+model OrganizationUser {
+  id                 String   @id @default(uuid())
+  role               Role     @default(MEMBER)
+
+  userID             String
+  organizationID     String
+
+  user               User    @relation(fields: [userID], references: [id], onDelete: Cascade)
+  organization       Organization @relation(fields: [organizationID], references: [id], onDelete: Cascade)
+}
+
+model Board {
+  id                 String   @id @default(uuid())
+  title              String
+
+  organizationID     String
+  organization       Organization @relation(fields: [organizationID], references: [id], onDelete: Cascade)
+
+  issues             Issue[]
+  sections           Section[]
+}
+
+model Issue {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+
+  issueUsers  IssueUser[]
+  comments    Comment[]
+
+  sectionID   String
+  section     Section @relation(fields: [sectionID], references: [id], onDelete: Restrict)
+
+  boardId     String
+  board       Board   @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+}
+
+model Section {
+  id        String   @id @default(uuid())
+  status    IssueStatus   @default(OPEN)
+
+  boardId   String
+  board     Board   @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  issues    Issue[]
+
+}
+
+model IssueUser {
+  id        String   @id @default(uuid())
+
+  issueID   String
+  userID    String
+
+  issue     Issue  @relation(fields: [issueID], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userID], references: [id])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+
+  userID    String
+  issueID   String
+
+  user      User    @relation(fields: [userID], references: [id], onDelete: Cascade)
+  issue     Issue  @relation(fields: [issueID], references: [id], onDelete: Cascade)
+}
+
+
+enum Role {
+  MEMBER
+  ADMIN
+}
+
+enum IssueStatus {
+  UPCOMING
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
