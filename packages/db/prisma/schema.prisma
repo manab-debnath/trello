@@ -13,95 +13,151 @@ datasource db {
 }
 
 model User {
-  id                 String   @id @default(uuid())
-  name               String
-  email              String   @unique
-  password           String
+  id       String @id @default(uuid())
+  name     String
+  email    String @unique
+  emailVerified      Boolean            @default(false)
+  image              String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 
   organization_users OrganizationUser[]
   issueUsers         IssueUser[]
   comments           Comment[]
+  sessions           Session[]
+  accounts           Account[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  issuer                String
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([issuer, accountId], map: "account_issuer_accountId_uidx")
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
 }
 
 model Organization {
-  id                 String   @id @default(uuid())
-  name               String
-  description        String
+  id          String @id @default(uuid())
+  name        String
+  description String
 
   organization_users OrganizationUser[]
   boards             Board[]
 }
 
 model OrganizationUser {
-  id                 String   @id @default(uuid())
-  role               Role     @default(MEMBER)
+  id   String @id @default(uuid())
+  role Role   @default(MEMBER)
 
-  userID             String
-  organizationID     String
+  userID         String
+  organizationID String
 
-  user               User    @relation(fields: [userID], references: [id], onDelete: Cascade)
-  organization       Organization @relation(fields: [organizationID], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userID], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationID], references: [id], onDelete: Cascade)
 }
 
 model Board {
-  id                 String   @id @default(uuid())
-  title              String
+  id    String @id @default(uuid())
+  title String
 
-  organizationID     String
-  organization       Organization @relation(fields: [organizationID], references: [id], onDelete: Cascade)
+  organizationID String
+  organization   Organization @relation(fields: [organizationID], references: [id], onDelete: Cascade)
 
-  issues             Issue[]
-  sections           Section[]
+  issues   Issue[]
+  sections Section[]
 }
 
 model Issue {
-  id          String   @id @default(uuid())
+  id          String @id @default(uuid())
   title       String
   description String
 
-  issueUsers  IssueUser[]
-  comments    Comment[]
+  issueUsers IssueUser[]
+  comments   Comment[]
 
-  sectionID   String
-  section     Section @relation(fields: [sectionID], references: [id], onDelete: Restrict)
+  sectionID String
+  section   Section @relation(fields: [sectionID], references: [id], onDelete: Restrict)
 
-  boardId     String
-  board       Board   @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  boardId String
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
 
 }
 
 model Section {
-  id        String   @id @default(uuid())
-  status    IssueStatus   @default(OPEN)
+  id     String      @id @default(uuid())
+  status IssueStatus @default(OPEN)
 
-  boardId   String
-  board     Board   @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  boardId String
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
 
-  issues    Issue[]
+  issues Issue[]
 
 }
 
 model IssueUser {
-  id        String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  issueID   String
-  userID    String
+  issueID String
+  userID  String
 
-  issue     Issue  @relation(fields: [issueID], references: [id], onDelete: Cascade)
-  user      User    @relation(fields: [userID], references: [id])
+  issue Issue @relation(fields: [issueID], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userID], references: [id])
 }
 
 model Comment {
-  id        String   @id @default(uuid())
-  content   String
+  id      String @id @default(uuid())
+  content String
 
-  userID    String
-  issueID   String
+  userID  String
+  issueID String
 
-  user      User    @relation(fields: [userID], references: [id], onDelete: Cascade)
-  issue     Issue  @relation(fields: [issueID], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userID], references: [id], onDelete: Cascade)
+  issue Issue @relation(fields: [issueID], references: [id], onDelete: Cascade)
 }
-
 
 enum Role {
   MEMBER
