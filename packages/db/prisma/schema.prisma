@@ -87,6 +87,8 @@ model Organization {
 
   organization_users OrganizationUser[]
   boards             Board[]
+
+  @@map("organization")
 }
 
 model OrganizationUser {
@@ -98,6 +100,8 @@ model OrganizationUser {
 
   user         User         @relation(fields: [userID], references: [id], onDelete: Cascade)
   organization Organization @relation(fields: [organizationID], references: [id], onDelete: Cascade)
+
+  @@map("organization_user")
 }
 
 model Board {
@@ -109,6 +113,8 @@ model Board {
 
   issues   Issue[]
   sections Section[]
+
+  @@map("board")
 }
 
 model Issue {
@@ -125,6 +131,7 @@ model Issue {
   boardId String
   board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
 
+  @@map("issue")
 }
 
 model Section {
@@ -136,6 +143,7 @@ model Section {
 
   issues Issue[]
 
+  @@map("section")
 }
 
 model IssueUser {
@@ -146,6 +154,8 @@ model IssueUser {
 
   issue Issue @relation(fields: [issueID], references: [id], onDelete: Cascade)
   user  User  @relation(fields: [userID], references: [id])
+
+  @@map("issue_user")
 }
 
 model Comment {
@@ -157,6 +167,8 @@ model Comment {
 
   user  User  @relation(fields: [userID], references: [id], onDelete: Cascade)
   issue Issue @relation(fields: [issueID], references: [id], onDelete: Cascade)
+
+  @@map("comment")
 }
 
 enum Role {
