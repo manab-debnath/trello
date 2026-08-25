@@ -95,6 +95,7 @@ model Organization {
 model OrganizationUser {
   id   String @id @default(uuid())
   role Role   @default(MEMBER)
+  accepted Boolean @default(false)
 
   userID         String
   organizationID String
