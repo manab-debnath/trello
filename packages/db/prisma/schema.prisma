@@ -87,6 +87,7 @@ model Organization {
 
   organization_users OrganizationUser[]
   boards             Board[]
+  pending_members    PendingMember[]
 
   @@map("organization")
 }
@@ -169,6 +170,17 @@ model Comment {
   issue Issue @relation(fields: [issueID], references: [id], onDelete: Cascade)
 
   @@map("comment")
+}
+
+// schema for those user who hasn't signed up yet but organization has invited them
+model PendingMember {
+  id String @id @default(uuid())
+  email String @unique
+
+  organizationID String
+  organization   Organization @relation(fields: [organizationID], references: [id], onDelete: Cascade)
+
+  @@map("pending_member")
 }
 
 enum Role {
