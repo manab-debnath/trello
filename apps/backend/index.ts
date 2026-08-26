@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
 import { auth } from "./config/auth";
+import { userRouter } from "./routes";
 
 const app = express();
 const port = 8000;
@@ -27,6 +28,8 @@ app.get("/api/health", (req, res) => {
     health: "OK",
   });
 });
+
+app.use("/api/user", userRouter);
 
 app.listen(port, () => {
     console.log(`Better Auth app listening on port ${port}`);
