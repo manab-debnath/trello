@@ -22,6 +22,13 @@ app.all("/api/auth/*splat", toNodeHandler(auth));
 app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Welcome to the Trello App",
+  });
+});
+
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     success: true,
