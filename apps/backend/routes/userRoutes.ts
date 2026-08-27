@@ -14,4 +14,6 @@ userRouter.patch("/update-profile", authMiddleware, changeUserInfo)
 
 userRouter.patch("/change-email", authMiddleware, changeEmail)
 
+userRouter.patch("/change-password", authMiddleware, changePassword)
+
 export default userRouter;

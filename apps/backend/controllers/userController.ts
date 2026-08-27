@@ -72,10 +72,36 @@ const changeEmail = async (req: Request, res: Response) => {
   }
 };
 
+const deleteAccount = async (req: Request, res: Response) => {
+  const userId = req.user.id;
+
+  if(!req.user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    await prisma.user.delete({
+      where: {
+        id: userId
+      }
+    })
+
+    logger.info(`Deleted account for user ${userId}`)
+    return res.json({ message: "Account deleted" });
+  } catch (error) {
+    if(error instanceof Error) {
+      logger.error({error}, `Error deleting account for user ${userId}`);
+    } else {
+      logger.error(`Error deleting account for user ${userId}`);
+    }
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 
 
 export {
   changeUserInfo,
   changeEmail,
-  
+  deleteAccount,
 };
