@@ -4,9 +4,13 @@ import cors from "cors";
 import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
 import { auth } from "./config/auth";
 import { userRouter } from "./routes";
+import { createHttpLogger, createLogger } from "logger";
 
 const app = express();
 const port = 8000;
+
+export const logger = createLogger("backend");
+const httpLogger = createHttpLogger(logger);
 
 // Configure CORS middleware
 app.use(
@@ -20,6 +24,7 @@ app.use(
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json());
+app.use(httpLogger)
 // app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {

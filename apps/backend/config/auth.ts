@@ -3,6 +3,7 @@ import { betterAuth } from "better-auth/minimal";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import {prisma} from "db/client"
 import { sendEmailVerification } from "./resend";
+import { logger } from "..";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -16,12 +17,11 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
-      console.log(url)
       await sendEmailVerification(user, url)
     },
 
     afterEmailVerification: async (user) => {
-      console.log(`Email verified for ${user.email}`);
+      logger.info(`Email verified for ${user.email}`);
       },
   },
   baseURL: "http://localhost:8000",

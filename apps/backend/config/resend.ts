@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { logger } from '..';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const emailFrom = process.env.EMAIL_FROM || "manab_debnath@nextstudio.tech";
@@ -6,7 +7,6 @@ const emailFrom = process.env.EMAIL_FROM || "manab_debnath@nextstudio.tech";
 
 
 export async function sendEmailVerification(user: { name: string, email: string }, url: string) {
-  console.log("sendEmailVerification: \n" , url)
   const { data, error } = await resend.emails.send({
     from: emailFrom,
     to: user.email,
@@ -121,8 +121,8 @@ export async function sendEmailVerification(user: { name: string, email: string 
   });
 
   if (error) {
-    return console.error({ error });
+    return logger.error({ error }, "Failed to send email verification");
   }
 
-  console.log({ data });
+  logger.info({ data }, "Email verification sent successfully");
 }
