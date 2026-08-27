@@ -18,6 +18,7 @@
     "pg": "^8.23.0"
   },
   "exports": {
-    "./client": "./index.ts"
+    "./client": "./index.ts",
+    "./types": "./types.ts"
   }
 }
