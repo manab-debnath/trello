@@ -16,4 +16,6 @@ userRouter.patch("/change-email", authMiddleware, changeEmail)
 
 userRouter.patch("/change-password", authMiddleware, changePassword)
 
+userRouter.delete("/delete-account", authMiddleware, deleteAccount)
+
 export default userRouter;

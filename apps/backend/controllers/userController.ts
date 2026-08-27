@@ -98,10 +98,38 @@ const deleteAccount = async (req: Request, res: Response) => {
   }
 };
 
+const changePassword = async (req: Request, res: Response) => {
+  const { newPassword, currentPassword } = req.body;
 
+  if(!newPassword || !currentPassword) {
+    return res.status(400).json({ message: "Password is required" });
+  }
+
+  try {
+    await auth.api.changePassword({
+      body: {
+        newPassword,
+        currentPassword,
+        revokeOtherSessions: true
+      },
+      headers: fromNodeHeaders(req.headers)
+    })
+
+    logger.info(`Changed password for user ${req.user.id}`)
+    return res.json({ message: "Password changed, user logged out" });
+  } catch (error) {
+    if(error instanceof Error) {
+      logger.error({error}, `Error while changing password for user ${req.user.id}`);
+    } else {
+      logger.error(`Error while changing password for user ${req.user.id}`);
+    }
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 export {
   changeUserInfo,
   changeEmail,
   deleteAccount,
+  changePassword
 };
