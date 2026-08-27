@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { auth } from "../config/auth";
 import { fromNodeHeaders } from "better-auth/node";
+import { logger } from "..";
 
 const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -17,7 +18,7 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
 
     next();
   } catch (error) {
-    console.error("Authentication error:", error);
+    logger.error({error}, "Authentication error");
     return res.status(401).json({ message: "Unauthorized" });
   }
 };
