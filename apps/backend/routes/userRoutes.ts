@@ -12,4 +12,6 @@ userRouter.get("/profile", authMiddleware, (req, res) => {
 
 userRouter.patch("/update-profile", authMiddleware, changeUserInfo)
 
+userRouter.patch("/change-email", authMiddleware, changeEmail)
+
 export default userRouter;

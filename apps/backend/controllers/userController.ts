@@ -42,8 +42,40 @@ const changeUserInfo = async (req: Request, res: Response) => {
   }
 };
 
+const changeEmail = async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  if(!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+
+  try {
+    await auth.api.changeEmail({
+      body: {
+        newEmail: email
+      },
+      headers: fromNodeHeaders(req.headers)
+    })
+
+    logger.info(`Change email for user ${req.user.id}`)
+    return res.json({ message: "Verification link sent" });
+  } catch (error) {
+    if (error instanceof Error) {
+      logger.error({ error }, "Error changing email");
+    } else {
+      logger.error("Unknown error while changing email");
+    }
+
+    return res.status(500).json({
+      message: "Failed to update email",
+    });
+  }
+};
+
 
 
 export {
   changeUserInfo,
+  changeEmail,
+  
 };
