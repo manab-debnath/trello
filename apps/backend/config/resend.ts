@@ -1,16 +1,18 @@
-import { Resend } from 'resend';
-import { logger } from '..';
+import { Resend } from "resend";
+import { logger } from "..";
+import type { EmailHeader } from "./auth";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const emailFrom = process.env.EMAIL_FROM || "manab_debnath@nextstudio.tech";
 
-
-
-export async function sendEmailVerification(user: { name: string, email: string }, url: string) {
+export async function sendResendEmail(
+  emailHeader: EmailHeader,
+  url: string,
+  emailType: "EMAILVERIFICATION" | "RESETPASSWORD",
+) {
   const { data, error } = await resend.emails.send({
-    from: emailFrom,
-    to: user.email,
-    subject: 'Verify your Trello email',
+    from: emailHeader.from,
+    to: emailHeader.to,
+    subject: emailHeader.subject,
     html: `
     <!DOCTYPE html>
     <html lang="en">
@@ -85,21 +87,21 @@ export async function sendEmailVerification(user: { name: string, email: string 
       <body>
         <div class="email-container">
           <div class="header">
-            <h1>Confirm Your Email Address</h1>
+            <h1>${emailType === "EMAILVERIFICATION" ? "Confirm Your Email Address" : "Reset Your Password"}</h1>
           </div>
 
           <div class="content">
-            <p>Hi ${user.name.split(' ')[0]},</p>
+            <p>Hi ${emailHeader.receiverName!.split(" ")[0]},</p>
             <p>
-              Thank you for signing up! Please verify your email address to complete your registration.
+             ${emailType === "EMAILVERIFICATION" ? "Thank you for signing up! Please verify your email address to complete your registration." : "Please click on the link below to reset your password."}
             </p>
 
             <div class="button-wrapper">
-              <a href="${url}" target="_blank" class="btn">Verify Email Address</a>
+              <a href="${url}" target="_blank" class="btn">${emailHeader.buttonText}</a>
             </div>
 
             <p>
-              This verification link will expire in 24 hours. If you did not create an account, no further action is
+              This verification link will expire in 24 hours.
               required.
             </p>
 
@@ -117,12 +119,12 @@ export async function sendEmailVerification(user: { name: string, email: string 
         </div>
       </body>
     </html>
-`
+`,
   });
 
   if (error) {
     return logger.error({ error }, "Failed to send email verification");
   }
 
-  logger.info({ data }, "Email verification sent successfully");
+  logger.info({ data }, "Email sent successfully");
 }

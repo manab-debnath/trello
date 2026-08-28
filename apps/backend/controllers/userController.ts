@@ -8,33 +8,35 @@ const changeUserInfo = async (req: Request, res: Response) => {
   const { name } = req.body;
   const user = req.user;
 
-  if(!user) {
+  if (!user) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  if(!name) {
+  if (!name) {
     return res.status(400).json({ message: "Name is required" });
   }
 
-  if(name === user.name) {
-    return res.status(400).json({ message: "Name is the same as the current name" });
+  if (name === user.name) {
+    return res
+      .status(400)
+      .json({ message: "Name is the same as the current name" });
   }
 
   try {
     const updateUser = await prisma.user.update({
       where: {
-        id: user.id
+        id: user.id,
       },
       data: {
-        name
-      }
-    })
+        name,
+      },
+    });
 
-    logger.info(`Updated user ${user.id}`)
+    logger.info(`Updated user ${user.id}`);
     res.json(updateUser);
   } catch (error) {
-    if(error instanceof Error) {
-      logger.error({error}, `Error updating user ${user.id}`);
+    if (error instanceof Error) {
+      logger.error({ error }, `Error updating user ${user.id}`);
     } else {
       logger.error(`Error updating user ${user.id}`);
     }
@@ -45,19 +47,19 @@ const changeUserInfo = async (req: Request, res: Response) => {
 const changeEmail = async (req: Request, res: Response) => {
   const { email } = req.body;
 
-  if(!email) {
+  if (!email) {
     return res.status(400).json({ message: "Email is required" });
   }
 
   try {
     await auth.api.changeEmail({
       body: {
-        newEmail: email
+        newEmail: email,
       },
-      headers: fromNodeHeaders(req.headers)
-    })
+      headers: fromNodeHeaders(req.headers),
+    });
 
-    logger.info(`Change email for user ${req.user.id}`)
+    logger.info(`Change email for user ${req.user.id}`);
     return res.json({ message: "Verification link sent" });
   } catch (error) {
     if (error instanceof Error) {
@@ -75,22 +77,22 @@ const changeEmail = async (req: Request, res: Response) => {
 const deleteAccount = async (req: Request, res: Response) => {
   const userId = req.user.id;
 
-  if(!req.user) {
+  if (!req.user) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
   try {
     await prisma.user.delete({
       where: {
-        id: userId
-      }
-    })
+        id: userId,
+      },
+    });
 
-    logger.info(`Deleted account for user ${userId}`)
+    logger.info(`Deleted account for user ${userId}`);
     return res.json({ message: "Account deleted" });
   } catch (error) {
-    if(error instanceof Error) {
-      logger.error({error}, `Error deleting account for user ${userId}`);
+    if (error instanceof Error) {
+      logger.error({ error }, `Error deleting account for user ${userId}`);
     } else {
       logger.error(`Error deleting account for user ${userId}`);
     }
@@ -101,7 +103,7 @@ const deleteAccount = async (req: Request, res: Response) => {
 const changePassword = async (req: Request, res: Response) => {
   const { newPassword, currentPassword } = req.body;
 
-  if(!newPassword || !currentPassword) {
+  if (!newPassword || !currentPassword) {
     return res.status(400).json({ message: "Password is required" });
   }
 
@@ -110,16 +112,19 @@ const changePassword = async (req: Request, res: Response) => {
       body: {
         newPassword,
         currentPassword,
-        revokeOtherSessions: true
+        revokeOtherSessions: true,
       },
-      headers: fromNodeHeaders(req.headers)
-    })
+      headers: fromNodeHeaders(req.headers),
+    });
 
-    logger.info(`Changed password for user ${req.user.id}`)
+    logger.info(`Changed password for user ${req.user.id}`);
     return res.json({ message: "Password changed, user logged out" });
   } catch (error) {
-    if(error instanceof Error) {
-      logger.error({error}, `Error while changing password for user ${req.user.id}`);
+    if (error instanceof Error) {
+      logger.error(
+        { error },
+        `Error while changing password for user ${req.user.id}`,
+      );
     } else {
       logger.error(`Error while changing password for user ${req.user.id}`);
     }
@@ -130,15 +135,74 @@ const changePassword = async (req: Request, res: Response) => {
 const signOut = async (req: Request, res: Response) => {
   try {
     await auth.api.signOut({
-      headers: fromNodeHeaders(req.headers)
-    })
+      headers: fromNodeHeaders(req.headers),
+    });
     logger.info(`Signed out user ${req.user.id}`);
     return res.json({ message: "Signed out successfully" });
   } catch (error) {
-    if(error instanceof Error) {
-      logger.error({error}, `Error while signing out user ${req.user.id}`);
+    if (error instanceof Error) {
+      logger.error({ error }, `Error while signing out user ${req.user.id}`);
     } else {
       logger.error(`Error while signing out user ${req.user.id}`);
+    }
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const forgotPassword = async (req: Request, res: Response) => {
+  const email = req.user.email;
+
+  if (!email) {
+    return res.status(400).json({
+      message: "Email is required",
+    });
+  }
+
+  try {
+    await auth.api.requestPasswordReset({
+      body: {
+        email,
+        redirectTo: "http://localhost:8000/reset-password", // call /reset-password api
+      },
+    });
+
+    logger.info(`Password reset link sent to ${email}`);
+    return res.json({
+      message: "If the email exists, a reset link has been sent",
+    });
+  } catch (error) {
+    logger.error({ error }, "Error requesting password reset");
+
+    return res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+};
+
+const resetPassword = async (req: Request, res: Response) => {
+  const { token, newPassword } = req.body;
+
+  if (!token || !newPassword) {
+    return res
+      .status(400)
+      .json({ message: "Token and new password are required" });
+  }
+
+  try {
+    await auth.api.resetPassword({
+      body: {
+        token,
+        newPassword,
+      },
+    });
+
+    logger.info(`Password reset successfully`);
+    return res.json({ message: "Password reset successfully" });
+  } catch (error) {
+    if (error instanceof Error) {
+      logger.error({ error }, `Error while resetting password`);
+    } else {
+      logger.error(`Error while resetting password`);
     }
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -149,5 +213,7 @@ export {
   changeEmail,
   deleteAccount,
   changePassword,
-  signOut
+  signOut,
+  forgotPassword,
+  resetPassword,
 };
