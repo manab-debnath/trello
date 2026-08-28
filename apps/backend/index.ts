@@ -24,7 +24,7 @@ app.use(
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json());
-app.use(httpLogger)
+// app.use(httpLogger)
 // app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {

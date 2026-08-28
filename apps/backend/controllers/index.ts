@@ -1,1 +1,7 @@
-export { changeUserInfo, changeEmail, changePassword, deleteAccount } from "./userController";
+export {
+	changeUserInfo,
+	changeEmail,
+	changePassword,
+	deleteAccount,
+	signOut,
+} from "./userController";

@@ -127,9 +127,27 @@ const changePassword = async (req: Request, res: Response) => {
   }
 };
 
+const signOut = async (req: Request, res: Response) => {
+  try {
+    await auth.api.signOut({
+      headers: fromNodeHeaders(req.headers)
+    })
+    logger.info(`Signed out user ${req.user.id}`);
+    return res.json({ message: "Signed out successfully" });
+  } catch (error) {
+    if(error instanceof Error) {
+      logger.error({error}, `Error while signing out user ${req.user.id}`);
+    } else {
+      logger.error(`Error while signing out user ${req.user.id}`);
+    }
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export {
   changeUserInfo,
   changeEmail,
   deleteAccount,
-  changePassword
+  changePassword,
+  signOut
 };

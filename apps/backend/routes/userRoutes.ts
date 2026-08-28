@@ -1,6 +1,6 @@
 import express from "express";
 import { authMiddleware } from "../middlewares";
-import { changeEmail, changePassword, changeUserInfo, deleteAccount } from "../controllers";
+import { changeEmail, changePassword, changeUserInfo, deleteAccount, signOut } from "../controllers";
 
 const userRouter = express.Router();
 
@@ -17,5 +17,7 @@ userRouter.patch("/change-email", authMiddleware, changeEmail)
 userRouter.patch("/change-password", authMiddleware, changePassword)
 
 userRouter.delete("/delete-account", authMiddleware, deleteAccount)
+
+userRouter.post("/sign-out", authMiddleware, signOut)
 
 export default userRouter;
