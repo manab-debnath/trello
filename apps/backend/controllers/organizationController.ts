@@ -78,4 +78,49 @@ const getAllOrganizations = async (req: Request, res: Response) => {
   }
 };
 
-export { createOrganization, getAllOrganizations };
+const getOrganizationById = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({ message: "Organization ID is required" });
+  }
+
+  try {
+    const organization = await prisma.organization.findUnique({
+      where: {
+        id: id,
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        organization_users: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!organization) {
+      return res.status(404).json({ message: "Organization not found" });
+    }
+
+    logger.info("Organization retrieved successfully");
+    return res.status(200).json(organization);
+  } catch (error) {
+    logger.error({ error }, "Error getting organization");
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export { createOrganization, getAllOrganizations, getOrganizationById };
