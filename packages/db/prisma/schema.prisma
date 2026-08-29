@@ -103,6 +103,7 @@ model OrganizationUser {
   user         User         @relation(fields: [userID], references: [id], onDelete: Cascade)
   organization Organization @relation(fields: [organizationID], references: [id], onDelete: Cascade)
 
+  @@unique([userID, organizationID])
   @@map("organization_user")
 }
 
