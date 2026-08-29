@@ -8,4 +8,4 @@ export {
   resetPassword,
 } from "./userController";
 
-export { createOrganization } from "./organizationController";
+export { createOrganization, getAllOrganizations } from "./organizationController";

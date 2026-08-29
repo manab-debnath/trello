@@ -45,4 +45,37 @@ const createOrganization = async (req: Request, res: Response) => {
   }
 };
 
-export { createOrganization };
+const getAllOrganizations = async (req: Request, res: Response) => {
+  const user = req.user;
+  if (!user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    const organizations = await prisma.organizationUser.findMany({
+      where: {
+        userID: user.id,
+      },
+      select: {
+        id: true,
+        role: true,
+        accepted: true,
+        organization: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        },
+      },
+    });
+
+    logger.info("Organizations retrieved successfully");
+    return res.status(200).json(organizations);
+  } catch (error) {
+    logger.error({ error }, "Error getting organizations");
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export { createOrganization, getAllOrganizations };

@@ -1,5 +1,5 @@
 import express from "express";
-import { createOrganization } from "../controllers";
+import { createOrganization, getAllOrganizations } from "../controllers";
 import { authMiddleware } from "../middlewares";
 
 const organizationRouter = express.Router();
@@ -9,5 +9,7 @@ organizationRouter.post(
   authMiddleware,
   createOrganization,
 );
+
+organizationRouter.get("/all", authMiddleware, getAllOrganizations)
 
 export default organizationRouter;
