@@ -7,3 +7,5 @@ export {
   forgotPassword,
   resetPassword,
 } from "./userController";
+
+export { createOrganization } from "./organizationController";

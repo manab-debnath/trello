@@ -1,9 +1,9 @@
-import "dotenv/config"
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
 import { auth } from "./config/auth";
-import { userRouter } from "./routes";
+import { organizationRouter, userRouter } from "./routes";
 import { createHttpLogger, createLogger } from "logger";
 
 const app = express();
@@ -18,7 +18,7 @@ app.use(
     origin: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
-  })
+  }),
 );
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
@@ -42,7 +42,8 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/user", userRouter);
+app.use("/api/organization", organizationRouter);
 
 app.listen(port, () => {
-    console.log(`Better Auth app listening on port ${port}`);
+  console.log(`Trello app listening on port ${port}`);
 });
