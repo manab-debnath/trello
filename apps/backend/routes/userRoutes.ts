@@ -12,27 +12,29 @@ import {
 
 const userRouter = express.Router();
 
-userRouter.get("/profile", authMiddleware, (req, res) => {
+// We will hit this route after reseting password using better auth feature
+// and get the token from the frontend url
+userRouter.post("/reset-password", resetPassword);
+
+userRouter.use(authMiddleware);
+
+userRouter.get("/profile", (req, res) => {
   const user = req.user;
 
   res.json(user);
 });
 
-userRouter.patch("/update-profile", authMiddleware, changeUserInfo);
+userRouter.patch("/update-profile", changeUserInfo);
 
-userRouter.patch("/change-email", authMiddleware, changeEmail);
+userRouter.patch("/change-email", changeEmail);
 
-userRouter.patch("/change-password", authMiddleware, changePassword);
+userRouter.patch("/change-password", changePassword);
 
-userRouter.delete("/delete-account", authMiddleware, deleteAccount);
+userRouter.delete("/delete-account", deleteAccount);
 
-userRouter.post("/sign-out", authMiddleware, signOut);
+userRouter.post("/sign-out", signOut);
 
 // Click Forgot Password -> Send reset link to email -> User clicks link -> Redirect to reset password page
-userRouter.post("/forgot-password", authMiddleware, forgotPassword);
-
-// We will hit this route after reseting password using better auth feature
-// and get the token from the frontend url
-userRouter.post("/reset-password", resetPassword);
+userRouter.post("/forgot-password", forgotPassword);
 
 export default userRouter;

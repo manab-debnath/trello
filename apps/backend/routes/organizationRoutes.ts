@@ -10,24 +10,20 @@ import { Role } from "db/types";
 
 const organizationRouter = express.Router();
 
-organizationRouter.post(
-  "/create-organization",
-  authMiddleware,
-  createOrganization,
-);
+organizationRouter.use(authMiddleware);
 
-organizationRouter.get("/all", authMiddleware, getAllOrganizations);
+organizationRouter.post("/create-organization", createOrganization);
+
+organizationRouter.get("/all", getAllOrganizations);
 
 organizationRouter.get(
   "/organization/:id",
-  authMiddleware,
   requireOrganizationRole(Role.ADMIN, Role.MEMBER),
   getOrganizationById,
 );
 
 organizationRouter.delete(
   "/organization/:id",
-  authMiddleware,
   requireOrganizationRole(Role.ADMIN),
   deleteOrganizationById,
 );
