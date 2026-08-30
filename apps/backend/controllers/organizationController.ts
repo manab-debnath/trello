@@ -123,4 +123,36 @@ const getOrganizationById = async (
   }
 };
 
-export { createOrganization, getAllOrganizations, getOrganizationById };
+const deleteOrganizationById = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({ message: "Organization ID is required" });
+  }
+
+  try {
+    const organization = await prisma.organization.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    logger.info("Organization deleted successfully");
+    return res
+      .status(200)
+      .json({ message: "Organization deleted successfully", organization });
+  } catch (error) {
+    logger.error({ error }, "Error deleting organization");
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export {
+  createOrganization,
+  getAllOrganizations,
+  getOrganizationById,
+  deleteOrganizationById,
+};

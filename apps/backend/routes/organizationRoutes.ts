@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createOrganization,
+  deleteOrganizationById,
   getAllOrganizations,
   getOrganizationById,
 } from "../controllers";
@@ -22,6 +23,13 @@ organizationRouter.get(
   authMiddleware,
   requireOrganizationRole(Role.ADMIN, Role.MEMBER),
   getOrganizationById,
+);
+
+organizationRouter.delete(
+  "/organization/:id",
+  authMiddleware,
+  requireOrganizationRole(Role.ADMIN),
+  deleteOrganizationById,
 );
 
 export default organizationRouter;

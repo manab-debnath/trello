@@ -12,4 +12,5 @@ export {
   createOrganization,
   getAllOrganizations,
   getOrganizationById,
+  deleteOrganizationById,
 } from "./organizationController";

@@ -42,7 +42,7 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/user", userRouter);
-app.use("/api/organization", organizationRouter);
+app.use("/api/organizations", organizationRouter);
 
 app.listen(port, () => {
   console.log(`Trello app listening on port ${port}`);
