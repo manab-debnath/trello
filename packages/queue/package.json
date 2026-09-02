@@ -13,6 +13,6 @@
     "bullmq": "^6.3.4"
   },
   "exports": {
-    "email-queue": "./index.ts"
+    "./email-queue": "./index.ts"
   }
 }
