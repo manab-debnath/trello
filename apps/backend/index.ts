@@ -41,6 +41,22 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+app.get("/reset-password", (req, res) => {
+  const { token } = req.query;
+  if (!token) {
+    return res.status(400).json({
+      success: false,
+      message: "No token provided",
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "You password has been reset",
+    token: token,
+  });
+});
+
 app.use("/api/user", userRouter);
 app.use("/api/organizations", organizationRouter);
 
