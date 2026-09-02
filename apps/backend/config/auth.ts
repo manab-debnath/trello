@@ -2,18 +2,11 @@ import "dotenv/config";
 import { betterAuth } from "better-auth/minimal";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "db/client";
-import { sendResendEmail } from "./resend";
 import { logger } from "..";
+import type { EmailHeader } from "types";
+import { emailQueue } from "queue/email-queue";
 
 const emailFrom = process.env.EMAIL_FROM || "manab_debnath@nextstudio.tech";
-
-export interface EmailHeader {
-  to: string;
-  from: string;
-  subject: string;
-  buttonText: string;
-  receiverName: string;
-}
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -30,11 +23,8 @@ export const auth = betterAuth({
         to: user.email,
         from: emailFrom,
         subject: "Reset your Trello password",
-        buttonText: "Reset Password",
-        receiverName: user.name,
       };
-      await sendResendEmail(emailHeader, url, "RESETPASSWORD");
-      console.log({ token });
+      await emailQueue.add("RESETPASSWORD", { emailHeader, user, url });
     },
 
     onPasswordReset: async ({ user }) => {
@@ -53,10 +43,8 @@ export const auth = betterAuth({
         to: user.email,
         from: emailFrom,
         subject: "Verify your Trello email",
-        buttonText: "Verify Email Address",
-        receiverName: user.name,
       };
-      await sendResendEmail(emailHeader, url, "EMAILVERIFICATION");
+      await emailQueue.add("EMAILVERIFICATION", { emailHeader, user, url });
     },
 
     afterEmailVerification: async (user) => {
