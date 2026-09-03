@@ -1,0 +1,15 @@
+services:
+  db:
+    restart: always
+    # Do not expose ports to host in production unless necessary
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: redis
+    volumes:
+      - redis_data:/data
+    restart: always
+
+volumes:
+  redis_data:
+    driver: local
