@@ -4,6 +4,7 @@ import {
   deleteOrganizationById,
   getAllOrganizations,
   getOrganizationById,
+  sendInvitation,
 } from "../controllers";
 import { authMiddleware, requireOrganizationRole } from "../middlewares";
 import { Role } from "db/types";
@@ -27,5 +28,7 @@ organizationRouter.delete(
   requireOrganizationRole(Role.ADMIN),
   deleteOrganizationById,
 );
+
+organizationRouter.post("/invite/:id", requireOrganizationRole(Role.ADMIN), sendInvitation);
 
 export default organizationRouter;

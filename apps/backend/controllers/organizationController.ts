@@ -2,6 +2,9 @@ import { prisma } from "db/client";
 import type { Request, Response } from "express";
 import { Role } from "../../../packages/db/generated/prisma/enums";
 import { logger } from "..";
+import { emailQueue } from "queue/email-queue";
+import { organization } from "better-auth/client";
+import type { EmailHeader } from "types";
 
 const createOrganization = async (req: Request, res: Response) => {
   const { name, description } = req.body;
@@ -150,9 +153,80 @@ const deleteOrganizationById = async (
   }
 };
 
+const sendInvitation = async (req: Request<{ id: string }>, res: Response) => {
+  const { id } = req.params;
+  const { email } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ message: "Organization ID is required" });
+  }
+
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    let sendInvitationToUser;
+
+    if (!user) {
+      sendInvitationToUser = await prisma.pendingMember.create({
+        data: {
+          email: email,
+          organizationID: id,
+        },
+      });
+
+      logger.info("User does not exist, creating pending member");
+    } else {
+      sendInvitationToUser = await prisma.organizationUser.create({
+        data: {
+          userID: user.id,
+          organizationID: id,
+        },
+      });
+      logger.info("User already exists, adding to organization");
+    }
+
+    const organization = await prisma.organization.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    // Send Email Logic
+    const emailHeader: EmailHeader = {
+      to: email,
+      from: process.env.EMAIL_FROM!,
+      subject: "Invitation to join organization",
+    };
+    await emailQueue.add("SENDINVITATION", {
+      type: "SENDINVITATION",
+      emailHeader,
+      user,
+      organization,
+    });
+
+    // WebSocket Logic
+
+    return res
+      .status(201)
+      .json({ message: "Invitation sent successfully", sendInvitationToUser });
+  } catch (error) {
+    logger.error({ error }, "Error sending invitation");
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export {
   createOrganization,
   getAllOrganizations,
   getOrganizationById,
   deleteOrganizationById,
+  sendInvitation,
 };

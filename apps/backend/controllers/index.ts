@@ -13,4 +13,5 @@ export {
   getAllOrganizations,
   getOrganizationById,
   deleteOrganizationById,
+  sendInvitation,
 } from "./organizationController";

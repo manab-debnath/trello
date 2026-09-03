@@ -1,39 +1,36 @@
 import { Resend } from "resend";
 import { logger } from "..";
-import type { EmailHeader, EmailType } from "types";
-import { emailVerificationTemplate } from "../htmlTemplate/emailVerification";
-import type { User } from "db/types";
-import { resetPasswordTemplate } from "../htmlTemplate/resetPassword";
+import type { EmailJob } from "types";
+import {
+  emailVerificationTemplate,
+  resetPasswordTemplate,
+  sendInvitationTemplate,
+} from "../htmlTemplate";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const emailFrom = process.env.EMAIL_FROM as string;
 
-export async function sendResendEmail(
-  emailHeader: EmailHeader,
-  user: User,
-  url: string,
-  emailType: EmailType,
-) {
+export async function sendResendEmail(job: EmailJob) {
   let htmlTemplate: string;
-  switch (emailType) {
+  switch (job.type) {
     case "EMAILVERIFICATION":
-      htmlTemplate = emailVerificationTemplate(user, url);
+      htmlTemplate = emailVerificationTemplate(job.user, job.url);
       break;
     case "RESETPASSWORD":
-      htmlTemplate = resetPasswordTemplate(user, url);
+      htmlTemplate = resetPasswordTemplate(job.user, job.url);
+      break;
+    case "SENDINVITATION":
+      htmlTemplate = sendInvitationTemplate(job.user, job.organization);
       break;
     default:
       htmlTemplate = "";
   }
   const { data, error } = await resend.emails.send({
-    from: emailHeader.from,
-    to: emailHeader.to,
-    subject: emailHeader.subject,
+    from: job.emailHeader.from || emailFrom,
+    to: job.emailHeader.to,
+    subject: job.emailHeader.subject,
     html: htmlTemplate,
   });
-
-  if (error) {
-    return logger.error({ error }, "Failed to send email verification");
-  }
 
   logger.info({ data }, "Email sent successfully");
 }
