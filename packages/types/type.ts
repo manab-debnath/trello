@@ -24,6 +24,7 @@ type EmailJob =
       emailHeader: EmailHeader;
       user: User;
       organization: Organization;
+      url: string;
     };
 
 export type { EmailHeader, EmailJob };
