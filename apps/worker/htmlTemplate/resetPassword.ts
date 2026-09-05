@@ -110,7 +110,7 @@ export const resetPasswordTemplate = (user: User, url: string) => {
 
           <!-- Footer -->
           <div class="footer">
-              <p>&copy; 2026 Trello. All rights reserved.</p>
+              <p>&copy; ${new Date().getFullYear()} Trello. All rights reserved.</p>
               <p>123 Main St, Anytown, USA</p>
           </div>
       </div>

@@ -20,7 +20,11 @@ export async function sendResendEmail(job: EmailJob) {
       htmlTemplate = resetPasswordTemplate(job.user, job.url);
       break;
     case "SENDINVITATION":
-      htmlTemplate = sendInvitationTemplate(job.user, job.organization);
+      htmlTemplate = sendInvitationTemplate(
+        job.user,
+        job.organization,
+        job.url,
+      );
       break;
     default:
       htmlTemplate = "";

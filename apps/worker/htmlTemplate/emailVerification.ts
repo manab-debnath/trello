@@ -102,7 +102,7 @@ export const emailVerificationTemplate = (user: User, url: string) => {
         </div>
 
         <div class="footer">
-          <p>&copy; 2026 Trello. All rights reserved.</p>
+          <p>&copy; ${new Date().getFullYear()} Trello. All rights reserved.</p>
         </div>
       </div>
     </body>

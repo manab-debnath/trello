@@ -1,6 +1,10 @@
 import type { Organization, User } from "db/types";
 
-export const sendInvitationTemplate = (user: User, organization: Organization) => {
+export const sendInvitationTemplate = (
+  user: User,
+  organization: Organization,
+  url: string
+) => {
   return `
   <!DOCTYPE html>
   <html lang="en">
@@ -111,7 +115,7 @@ export const sendInvitationTemplate = (user: User, organization: Organization) =
               <p>Click the button below to accept the invitation and set up your workspace profile:</p>
 
               <div class="button-wrapper">
-                  <a href="{{AcceptInviteURL}}" target="_blank" class="btn">Accept Invitation</a>
+                  <a href="${url}" target="_blank" class="btn">Accept Invitation</a>
               </div>
 
               <p style="font-size: 14px; color: #666666;">This invitation will expire in 7 days. If you were not expecting this invite, you can safely ignore this email.</p>
@@ -119,13 +123,13 @@ export const sendInvitationTemplate = (user: User, organization: Organization) =
               <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
 
               <p class="alt-link">Having trouble with the button? Copy and paste this link into your web browser:<br>
-              <a href="{{AcceptInviteURL}}" style="color: #059669;">{{AcceptInviteURL}}</a></p>
+              <a href="${url}" style="color: #059669;">${url}</a></p>
           </div>
 
           <!-- Footer -->
           <div class="footer">
-              <p>&copy; {{Year}} {{PlatformName}}. All rights reserved.</p>
-              <p>{{CompanyAddress}}</p>
+              <p>&copy; ${new Date().getFullYear()} Trello. All rights reserved.</p>
+              <p>123 Main St, Anytown, USA</p>
           </div>
       </div>
 
