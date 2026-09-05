@@ -155,7 +155,7 @@ const deleteOrganizationById = async (
 const sendInvitation = async (req: Request<{ id: string }>, res: Response) => {
   const { id } = req.params;
   const { email } = req.body;
-  const user = req.user;
+  const adminUser = req.user;
 
   if (!id) {
     return res.status(400).json({ message: "Organization ID is required" });
@@ -202,7 +202,7 @@ const sendInvitation = async (req: Request<{ id: string }>, res: Response) => {
     // Send Email Logic
     const emailHeader: EmailHeader = {
       to: email,
-      from: user?.email as string,
+      from: adminUser?.email as string,
       subject: "Invitation to join organization",
     };
     await emailQueue.add("SENDINVITATION", {
