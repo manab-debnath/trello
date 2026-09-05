@@ -4,6 +4,8 @@ import { Role } from "../../../packages/db/generated/prisma/enums";
 import { logger } from "..";
 import { emailQueue } from "queue/email-queue";
 import type { EmailHeader } from "types";
+import crypto from "node:crypto";
+import Redis from "ioredis";
 
 const createOrganization = async (req: Request, res: Response) => {
   const { name, description } = req.body;
@@ -173,6 +175,8 @@ const sendInvitation = async (req: Request<{ id: string }>, res: Response) => {
     });
 
     let sendInvitationToUser;
+    const redis = new Redis();
+    const token = crypto.randomBytes(32).toString("hex");
 
     if (!user) {
       sendInvitationToUser = await prisma.pendingMember.create({
@@ -193,6 +197,16 @@ const sendInvitation = async (req: Request<{ id: string }>, res: Response) => {
       logger.info("User already exists, adding to organization");
     }
 
+    await redis.set(
+      `invitation:${token}`,
+      JSON.stringify({
+        email,
+        organizationID: id,
+      }),
+      "EX",
+      60 * 60 * 24 * 7,
+    );
+
     const organization = await prisma.organization.findUnique({
       where: {
         id: id,
@@ -210,6 +224,7 @@ const sendInvitation = async (req: Request<{ id: string }>, res: Response) => {
       emailHeader,
       user,
       organization,
+      url: process.env.BETTER_AUTH_URL + `/invite?token=${token}`,
     });
 
     // WebSocket Logic
