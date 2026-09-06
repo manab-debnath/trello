@@ -41,10 +41,15 @@ export const auth = betterAuth({
     sendVerificationEmail: async ({ user, url }) => {
       const emailHeader: EmailHeader = {
         to: user.email,
-        from: emailFrom,
+        from: process.env.EMAIL_FROM as string,
         subject: "Verify your Trello email",
       };
-      await emailQueue.add("EMAILVERIFICATION", { emailHeader, user, url });
+      await emailQueue.add("EMAILVERIFICATION", {
+        type: "EMAILVERIFICATION",
+        emailHeader,
+        user,
+        url,
+      });
     },
 
     afterEmailVerification: async (user) => {
