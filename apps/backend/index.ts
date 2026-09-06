@@ -5,9 +5,11 @@ import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
 import { auth } from "./config/auth";
 import { organizationRouter, userRouter } from "./routes";
 import { createHttpLogger, createLogger } from "logger";
+import Redis from "ioredis";
 
 const app = express();
-const port = 8000;
+const port = process.env.PORT;
+export const redis = new Redis(process.env.REDIS_URL as string);
 
 export const logger = createLogger("backend");
 const httpLogger = createHttpLogger(logger);
