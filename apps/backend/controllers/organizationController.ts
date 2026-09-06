@@ -1,11 +1,10 @@
 import { prisma } from "db/client";
 import type { Request, Response } from "express";
 import { Role } from "../../../packages/db/generated/prisma/enums";
-import { logger } from "..";
+import { logger, redis } from "..";
 import { emailQueue } from "queue/email-queue";
 import type { EmailHeader } from "types";
 import crypto from "node:crypto";
-import Redis from "ioredis";
 
 const createOrganization = async (req: Request, res: Response) => {
   const { name, description } = req.body;
@@ -175,7 +174,6 @@ const sendInvitation = async (req: Request<{ id: string }>, res: Response) => {
     });
 
     let sendInvitationToUser;
-    const redis = new Redis();
     const token = crypto.randomBytes(32).toString("hex");
 
     if (!user) {
@@ -202,6 +200,7 @@ const sendInvitation = async (req: Request<{ id: string }>, res: Response) => {
       JSON.stringify({
         email,
         organizationID: id,
+        createdAT: new Date().toISOString(),
       }),
       "EX",
       60 * 60 * 24 * 7,
@@ -216,15 +215,17 @@ const sendInvitation = async (req: Request<{ id: string }>, res: Response) => {
     // Send Email Logic
     const emailHeader: EmailHeader = {
       to: email,
-      from: adminUser?.email as string,
+      from: process.env.EMAIL_FROM as string,
       subject: "Invitation to join organization",
     };
+    const url = process.env.BETTER_AUTH_URL + `/invite?token=${token}`;
+
     await emailQueue.add("SENDINVITATION", {
       type: "SENDINVITATION",
       emailHeader,
-      user,
+      user: user ?? null,
       organization,
-      url: process.env.BETTER_AUTH_URL + `/invite?token=${token}`,
+      url,
     });
 
     // WebSocket Logic
