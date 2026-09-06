@@ -22,7 +22,7 @@ type EmailJob =
   | {
       type: "SENDINVITATION";
       emailHeader: EmailHeader;
-      user: User;
+      user?: User | null;
       organization: Organization;
       url: string;
     };
