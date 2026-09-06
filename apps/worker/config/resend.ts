@@ -21,7 +21,7 @@ export async function sendResendEmail(job: EmailJob) {
       break;
     case "SENDINVITATION":
       htmlTemplate = sendInvitationTemplate(
-        job.user,
+        job.user ?? null,
         job.organization,
         job.url,
       );
@@ -35,6 +35,11 @@ export async function sendResendEmail(job: EmailJob) {
     subject: job.emailHeader.subject,
     html: htmlTemplate,
   });
+
+  if (error) {
+    logger.error({ error }, "Failed to send email");
+    throw new Error(error.message);
+  }
 
   logger.info({ data }, "Email sent successfully");
 }

@@ -1,9 +1,9 @@
 import type { Organization, User } from "db/types";
 
 export const sendInvitationTemplate = (
-  user: User,
+  user: User | null,
   organization: Organization,
-  url: string
+  url: string,
 ) => {
   return `
   <!DOCTYPE html>
@@ -103,8 +103,8 @@ export const sendInvitationTemplate = (
 
           <!-- Content -->
           <div class="content">
-              <p>Hi ${user.name.split(" ")[0]},</p>
-              <p><strong>{{InviterName}}</strong> has invited you to join their organization on Trello.</p>
+              <p>Hi ${user && user.name.split(" ")[0]},</p>
+              <p><strong>You have been invited to join</strong> ${organization.name} on Trello.</p>
 
               <!-- Organization Details -->
               <div class="org-card">
