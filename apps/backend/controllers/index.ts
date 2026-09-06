@@ -6,6 +6,7 @@ export {
   signOut,
   forgotPassword,
   resetPassword,
+  acceptInvitation,
 } from "./userController";
 
 export {

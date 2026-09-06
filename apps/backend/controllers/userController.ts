@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { auth } from "../config/auth";
 import { fromNodeHeaders } from "better-auth/node";
-import { logger } from "..";
+import { logger, redis } from "..";
 import { prisma } from "db/client";
 
 const changeUserInfo = async (req: Request, res: Response) => {
@@ -208,6 +208,105 @@ const resetPassword = async (req: Request, res: Response) => {
   }
 };
 
+const acceptInvitation = async (req: Request, res: Response) => {
+  const { token } = req.params;
+  const user = req.user;
+
+  if (!token) {
+    return res.status(400).json({ message: "Token is required" });
+  }
+
+  try {
+    // Get invitation from Redis
+    const data = await redis.get(`invitation:${token}`);
+    if (!data) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    const invitationData = JSON.parse(data as string);
+
+    // Verify invitation belongs to authenticated user
+    if (user.email !== invitationData.email) {
+      return res.status(403).json({ message: "User does not match" });
+    }
+
+    // Check whether user is already a member
+    const existingOrganizationUser = await prisma.organizationUser.findUnique({
+      where: {
+        userID_organizationID: {
+          userID: user.id as string,
+          organizationID: invitationData.organizationID,
+        },
+      },
+    });
+
+    if (existingOrganizationUser) {
+      await prisma.organizationUser.update({
+        where: {
+          userID_organizationID: {
+            userID: user.id as string,
+            organizationID: invitationData.organizationID,
+          },
+        },
+        data: {
+          accepted: true,
+        },
+      });
+    }
+    // User isn't a member yet
+    else {
+      await prisma.$transaction(async (tx) => {
+        const pendingMember = await tx.pendingMember.findUnique({
+          where: {
+            email: user.email,
+            organizationID: invitationData.organizationID,
+          },
+        });
+
+        if (!pendingMember) {
+          throw new Error("Invalid Invitation");
+        }
+
+        await tx.organizationUser.create({
+          data: {
+            userID: user.id as string,
+            organizationID: invitationData.organizationID,
+            accepted: true,
+          },
+        });
+
+        await tx.pendingMember.delete({
+          where: {
+            email: user.email,
+            organizationID: invitationData.organizationID,
+          },
+        });
+
+        return true;
+      });
+    }
+
+    // Remove invitation token only after DB transaction succeeds
+    await redis.del(`invitation:${token}`);
+
+    return res.status(200).json({
+      message: "Invitation accepted successfully",
+    });
+  } catch (error) {
+    if (error instanceof Error && error.message === "Invalid invitation") {
+      return res.status(404).json({
+        message: error.message,
+      });
+    }
+
+    logger.error({ error }, "Error accepting invitation");
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
 export {
   changeUserInfo,
   changeEmail,
@@ -216,4 +315,5 @@ export {
   signOut,
   forgotPassword,
   resetPassword,
+  acceptInvitation,
 };

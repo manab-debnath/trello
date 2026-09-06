@@ -1,6 +1,7 @@
 import express from "express";
 import { authMiddleware } from "../middlewares";
 import {
+  acceptInvitation,
   changeEmail,
   changePassword,
   changeUserInfo,
@@ -36,5 +37,7 @@ userRouter.post("/sign-out", signOut);
 
 // Click Forgot Password -> Send reset link to email -> User clicks link -> Redirect to reset password page
 userRouter.post("/forgot-password", forgotPassword);
+
+userRouter.post("/accept-invitation/:token", acceptInvitation);
 
 export default userRouter;
