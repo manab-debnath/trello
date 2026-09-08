@@ -7,6 +7,7 @@ import {
   changeUserInfo,
   deleteAccount,
   forgotPassword,
+  rejectInvitation,
   resetPassword,
   signOut,
 } from "../controllers";
@@ -39,5 +40,7 @@ userRouter.post("/sign-out", signOut);
 userRouter.post("/forgot-password", forgotPassword);
 
 userRouter.post("/accept-invitation/:token", acceptInvitation);
+
+userRouter.delete("/reject-invitation/:token", rejectInvitation);
 
 export default userRouter;

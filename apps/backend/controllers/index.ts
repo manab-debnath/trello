@@ -7,6 +7,7 @@ export {
   forgotPassword,
   resetPassword,
   acceptInvitation,
+  rejectInvitation,
 } from "./userController";
 
 export {

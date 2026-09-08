@@ -307,6 +307,81 @@ const acceptInvitation = async (req: Request, res: Response) => {
   }
 };
 
+const rejectInvitation = async (req: Request, res: Response) => {
+  const { token } = req.params;
+  const user = req.user;
+
+  if (!token) {
+    return res.status(400).json({
+      message: "Token is required",
+    });
+  }
+
+  try {
+    // Get invitation from Redis
+    const data = await redis.get(`invitation:${token}`);
+    if (!data) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    const invitationData = JSON.parse(data as string);
+
+    // Verify invitation belongs to authenticated user
+    if (user.email !== invitationData.email) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    // Check whether user is already a member
+    const existingOrganizationUser = await prisma.organizationUser.findUnique({
+      where: {
+        userID_organizationID: {
+          userID: user.id as string,
+          organizationID: invitationData.organizationID,
+        },
+      },
+    });
+
+    // User already had an organization user entry
+    if (existingOrganizationUser) {
+      await prisma.organizationUser.delete({
+        where: {
+          userID_organizationID: {
+            userID: user.id as string,
+            organizationID: invitationData.organizationID,
+          },
+        },
+      });
+    } else {
+      // User wasn't a member
+      await prisma.pendingMember.delete({
+        where: {
+          email: user.email,
+          organizationID: invitationData.organizationID,
+        },
+      });
+    }
+
+    // Remove invitation token
+    await redis.del(`invitation:${token}`);
+
+    return res.status(200).json({
+      message: "Invitation rejected successfully",
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(404).json({
+        message: error.message,
+      });
+    }
+
+    logger.error({ error }, "Error rejecting invitation");
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
 export {
   changeUserInfo,
   changeEmail,
@@ -316,4 +391,5 @@ export {
   forgotPassword,
   resetPassword,
   acceptInvitation,
+  rejectInvitation,
 };
