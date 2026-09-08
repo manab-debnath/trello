@@ -6,11 +6,11 @@ import { logger } from "..";
 const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const session = await auth.api.getSession({
-      headers: fromNodeHeaders(req.headers)
-    })
+      headers: fromNodeHeaders(req.headers),
+    });
 
-    if(!session) {
-      return res.status(401).json({ message: "Unauthorized" });
+    if (!session) {
+      return res.status(401).json({ message: "Unauthenticated" });
     }
 
     req.user = session.user;
@@ -18,8 +18,8 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
 
     next();
   } catch (error) {
-    logger.error({error}, "Authentication error");
-    return res.status(401).json({ message: "Unauthorized" });
+    logger.error({ error }, "Authentication error");
+    return res.status(401).json({ message: "Unauthenticated" });
   }
 };
 
