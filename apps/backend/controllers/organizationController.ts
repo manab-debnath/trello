@@ -82,19 +82,19 @@ const getAllOrganizations = async (req: Request, res: Response) => {
 };
 
 const getOrganizationById = async (
-  req: Request<{ id: string }>,
+  req: Request<{ orgID: string }>,
   res: Response,
 ) => {
-  const { id } = req.params;
+  const { orgID } = req.params;
 
-  if (!id) {
+  if (!orgID) {
     return res.status(400).json({ message: "Organization ID is required" });
   }
 
   try {
     const organization = await prisma.organization.findUnique({
       where: {
-        id: id,
+        id: orgID,
       },
       select: {
         id: true,
@@ -127,19 +127,19 @@ const getOrganizationById = async (
 };
 
 const deleteOrganizationById = async (
-  req: Request<{ id: string }>,
+  req: Request<{ orgID: string }>,
   res: Response,
 ) => {
-  const { id } = req.params;
+  const { orgID } = req.params;
 
-  if (!id) {
+  if (!orgID) {
     return res.status(400).json({ message: "Organization ID is required" });
   }
 
   try {
     const organization = await prisma.organization.delete({
       where: {
-        id: id,
+        id: orgID,
       },
     });
 
@@ -153,12 +153,15 @@ const deleteOrganizationById = async (
   }
 };
 
-const sendInvitation = async (req: Request<{ id: string }>, res: Response) => {
-  const { id } = req.params;
+const sendInvitation = async (
+  req: Request<{ orgID: string }>,
+  res: Response,
+) => {
+  const { orgID } = req.params;
   const { email } = req.body;
   const adminUser = req.user;
 
-  if (!id) {
+  if (!orgID) {
     return res.status(400).json({ message: "Organization ID is required" });
   }
 
@@ -180,7 +183,7 @@ const sendInvitation = async (req: Request<{ id: string }>, res: Response) => {
       sendInvitationToUser = await prisma.pendingMember.create({
         data: {
           email: email,
-          organizationID: id,
+          organizationID: orgID,
         },
       });
 
@@ -189,7 +192,7 @@ const sendInvitation = async (req: Request<{ id: string }>, res: Response) => {
       sendInvitationToUser = await prisma.organizationUser.create({
         data: {
           userID: user.id,
-          organizationID: id,
+          organizationID: orgID,
         },
       });
       logger.info("User already exists, adding to organization");
@@ -199,7 +202,7 @@ const sendInvitation = async (req: Request<{ id: string }>, res: Response) => {
       `invitation:${token}`,
       JSON.stringify({
         email,
-        organizationID: id,
+        organizationID: orgID,
         createdAT: new Date().toISOString(),
       }),
       "EX",
@@ -208,7 +211,7 @@ const sendInvitation = async (req: Request<{ id: string }>, res: Response) => {
 
     const organization = await prisma.organization.findUnique({
       where: {
-        id: id,
+        id: orgID,
       },
     });
 

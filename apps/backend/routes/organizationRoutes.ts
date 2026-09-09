@@ -1,10 +1,10 @@
 import express from "express";
 import {
-  createOrganization,
-  deleteOrganizationById,
-  getAllOrganizations,
-  getOrganizationById,
-  sendInvitation,
+	createOrganization,
+	deleteOrganizationById,
+	getAllOrganizations,
+	getOrganizationById,
+	sendInvitation,
 } from "../controllers";
 import { authMiddleware, requireOrganizationRole } from "../middlewares";
 import { Role } from "db/types";
@@ -18,17 +18,21 @@ organizationRouter.post("/create-organization", createOrganization);
 organizationRouter.get("/all", getAllOrganizations);
 
 organizationRouter.get(
-  "/organization/:id",
-  requireOrganizationRole(Role.ADMIN, Role.MEMBER),
-  getOrganizationById,
+	"/organization/:orgID",
+	requireOrganizationRole(Role.ADMIN, Role.MEMBER),
+	getOrganizationById,
 );
 
 organizationRouter.delete(
-  "/organization/:id",
-  requireOrganizationRole(Role.ADMIN),
-  deleteOrganizationById,
+	"/organization/:orgID",
+	requireOrganizationRole(Role.ADMIN),
+	deleteOrganizationById,
 );
 
-organizationRouter.post("/invite/:id", requireOrganizationRole(Role.ADMIN), sendInvitation);
+organizationRouter.post(
+	"/invite/:orgID",
+	requireOrganizationRole(Role.ADMIN),
+	sendInvitation,
+);
 
 export default organizationRouter;

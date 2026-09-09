@@ -5,12 +5,12 @@ import { logger } from "..";
 
 const requireOrganizationRole = (...roles: Role[]) => {
   return async (
-    req: Request<{ id: string }>,
+    req: Request<{ orgID: string }>,
     res: Response,
     next: NextFunction,
   ) => {
     const userID = req.user?.id;
-    const organizationID = req.params.id;
+    const organizationID = req.params.orgID;
 
     if (!organizationID) {
       return res.status(400).json({
