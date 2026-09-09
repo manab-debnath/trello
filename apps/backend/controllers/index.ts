@@ -17,3 +17,5 @@ export {
   deleteOrganizationById,
   sendInvitation,
 } from "./organizationController";
+
+export { getAllBoards } from "./boardController";
