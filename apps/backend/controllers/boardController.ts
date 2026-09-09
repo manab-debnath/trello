@@ -23,4 +23,24 @@ const getAllBoards = async (req: Request, res: Response) => {
   }
 };
 
-export { getAllBoards };
+const createBoard = async (req: Request, res: Response) => {
+  const { orgID } = req.params;
+  const { title } = req.body;
+
+  try {
+    const board = await prisma.board.create({
+      data: {
+        title,
+        organizationID: orgID as string,
+      },
+    });
+    return res
+      .status(201)
+      .json({ message: "Board created successfully", board });
+  } catch (error) {
+    logger.error({ error }, "Error creating board");
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export { getAllBoards, createBoard };

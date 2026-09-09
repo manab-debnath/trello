@@ -1,9 +1,9 @@
 import express from "express";
 import { authMiddleware, requireOrganizationRole } from "../middlewares";
 import { Role } from "db/types";
-import { getAllBoards } from "../controllers";
+import { createBoard, getAllBoards } from "../controllers";
 
-const boardRoutes = express.Router();
+const boardRoutes = express.Router({ mergeParams: true });
 
 boardRoutes.use(authMiddleware);
 
@@ -13,6 +13,9 @@ boardRoutes.get(
   getAllBoards,
 );
 
+// Only admins can create, update, and delete boards
 boardRoutes.use(requireOrganizationRole(Role.ADMIN));
+
+boardRoutes.post("/create-board", createBoard);
 
 export default boardRoutes;
