@@ -23,6 +23,38 @@ const getAllBoards = async (req: Request, res: Response) => {
   }
 };
 
+const getBoard = async (req: Request, res: Response) => {
+  const { boardID } = req.params;
+
+  try {
+    const board = await prisma.board.findUnique({
+      where: {
+        id: boardID as string,
+      },
+      select: {
+        id: true,
+        title: true,
+        issues: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+          },
+        },
+      },
+    });
+
+    if (!board) return res.status(404).json({ message: "Board not found" });
+
+    return res
+      .status(200)
+      .json({ message: "Board retrieved successfully", board });
+  } catch (error) {
+    logger.error({ error }, "Error retrieving board");
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const createBoard = async (req: Request, res: Response) => {
   const { orgID } = req.params;
   const { title } = req.body;
@@ -78,4 +110,4 @@ const updateBoard = async (req: Request, res: Response) => {
   }
 };
 
-export { getAllBoards, createBoard, updateBoard };
+export { getAllBoards, createBoard, updateBoard, getBoard };
