@@ -65,6 +65,9 @@ const createBoard = async (req: Request, res: Response) => {
         title,
         organizationID: orgID as string,
       },
+      omit: {
+        organizationID: true,
+      },
     });
     return res
       .status(201)
