@@ -3,6 +3,7 @@ import { authMiddleware, requireOrganizationRole } from "../middlewares";
 import { Role } from "db/types";
 import {
   createBoard,
+  deleteBoard,
   getAllBoards,
   getBoard,
   updateBoard,
@@ -30,5 +31,7 @@ boardRoutes.use(requireOrganizationRole(Role.ADMIN));
 boardRoutes.post("/create-board", createBoard);
 
 boardRoutes.patch("/boards/update-board/:boardID", updateBoard);
+
+boardRoutes.delete("/boards/delete-board/:boardID", deleteBoard);
 
 export default boardRoutes;

@@ -23,4 +23,5 @@ export {
   createBoard,
   updateBoard,
   getBoard,
+  deleteBoard,
 } from "./boardController";

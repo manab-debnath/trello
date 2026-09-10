@@ -110,4 +110,41 @@ const updateBoard = async (req: Request, res: Response) => {
   }
 };
 
-export { getAllBoards, createBoard, updateBoard, getBoard };
+const deleteBoard = async (req: Request, res: Response) => {
+  const { boardID } = req.params;
+
+  try {
+    const board = await prisma.board.findUnique({
+      where: {
+        id: boardID as string,
+      },
+      select: {
+        issues: true,
+      },
+    });
+
+    if (!board) {
+      return res.status(404).json({ message: "Board not found" });
+    }
+
+    if (board.issues && board.issues.length > 0) {
+      return res.status(400).json({ message: "Board has issues" });
+    } else {
+      await prisma.board.delete({
+        where: {
+          id: boardID as string,
+        },
+      });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Board deleted successfully", board });
+  } catch (error) {
+    logger.error({ error }, "Error deleting board");
+
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export { getAllBoards, createBoard, updateBoard, getBoard, deleteBoard };
