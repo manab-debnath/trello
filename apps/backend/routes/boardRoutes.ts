@@ -1,7 +1,7 @@
 import express from "express";
 import { authMiddleware, requireOrganizationRole } from "../middlewares";
 import { Role } from "db/types";
-import { createBoard, getAllBoards } from "../controllers";
+import { createBoard, getAllBoards, updateBoard } from "../controllers";
 
 const boardRoutes = express.Router({ mergeParams: true });
 
@@ -17,5 +17,7 @@ boardRoutes.get(
 boardRoutes.use(requireOrganizationRole(Role.ADMIN));
 
 boardRoutes.post("/create-board", createBoard);
+
+boardRoutes.patch("/boards/update-board/:boardID", updateBoard);
 
 export default boardRoutes;

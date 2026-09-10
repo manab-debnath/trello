@@ -18,4 +18,4 @@ export {
   sendInvitation,
 } from "./organizationController";
 
-export { getAllBoards, createBoard } from "./boardController";
+export { getAllBoards, createBoard, updateBoard } from "./boardController";
