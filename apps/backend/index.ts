@@ -3,7 +3,12 @@ import express from "express";
 import cors from "cors";
 import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
 import { auth } from "./config/auth";
-import { boardRouter, organizationRouter, userRouter } from "./routes";
+import {
+  boardRouter,
+  organizationRouter,
+  sectionRoutes,
+  userRouter,
+} from "./routes";
 import { createHttpLogger, createLogger } from "logger";
 import Redis from "ioredis";
 
@@ -62,6 +67,7 @@ app.get("/reset-password", (req, res) => {
 app.use("/api/user", userRouter);
 app.use("/api/organizations", organizationRouter);
 app.use("/api/organization/:orgID", boardRouter);
+app.use("/api/organization/:orgID/board/:boardID", sectionRoutes);
 
 app.listen(port, () => {
   console.log(`Trello app listening on port ${port}`);

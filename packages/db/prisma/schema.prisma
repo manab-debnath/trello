@@ -146,6 +146,7 @@ model Section {
 
   issues Issue[]
 
+  @@unique([boardId, status])
   @@map("section")
 }
 

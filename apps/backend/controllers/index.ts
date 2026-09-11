@@ -25,3 +25,7 @@ export {
   getBoard,
   deleteBoard,
 } from "./boardController";
+
+export {
+  createSection,
+} from "./sectionController";
