@@ -1,6 +1,6 @@
 import { IssueStatus } from "db/types";
 import type { Request, Response } from "express";
-import { logger } from "..";
+import { logger, redis } from "..";
 import { prisma } from "db/client";
 import { Prisma } from "../../../packages/db/generated/prisma/client";
 
@@ -54,4 +54,47 @@ const createSection = async (
   }
 };
 
-export { createSection };
+const getAllSections = async (
+  req: Request<{ boardID: string }>,
+  res: Response,
+) => {
+  const { boardID } = req.params;
+
+  if (!boardID) {
+    return res.status(400).json({ message: "boardID is required" });
+  }
+
+  const cacheData = await redis.get(`sections:${boardID}`);
+  if (cacheData) {
+    const { sections } = JSON.parse(cacheData);
+    return res.status(200).json({
+      message: "Sections retrieved successfully",
+      sections,
+    });
+  }
+
+  try {
+    const sections = await prisma.section.findMany({
+      where: {
+        boardId: boardID,
+      },
+      omit: {
+        boardId: true,
+      },
+    });
+
+    await redis.set(
+      `sections:${boardID}`,
+      JSON.stringify({ sections, createdAt: new Date().toISOString() }),
+    );
+
+    return res
+      .status(200)
+      .json({ message: "Sections retrieved successfully", sections });
+  } catch (error) {
+    logger.error({ error }, "Failed to retrieve sections");
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export { createSection, getAllSections };

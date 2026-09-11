@@ -1,12 +1,14 @@
 import express from "express";
 import { authMiddleware, requireOrganizationRole } from "../middlewares";
 import { Role } from "db/types";
-import { createSection } from "../controllers";
+import { createSection, getAllSections } from "../controllers";
 
 const sectionRoutes = express.Router({ mergeParams: true });
 
 sectionRoutes.use(authMiddleware, requireOrganizationRole(Role.ADMIN));
 
 sectionRoutes.post("/create-section", createSection);
+
+sectionRoutes.get("/sections", getAllSections);
 
 export default sectionRoutes;

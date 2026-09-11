@@ -28,4 +28,5 @@ export {
 
 export {
   createSection,
+  getAllSections,
 } from "./sectionController";
