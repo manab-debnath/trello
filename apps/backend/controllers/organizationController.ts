@@ -198,6 +198,7 @@ const sendInvitation = async (
       logger.info("User already exists, adding to organization");
     }
 
+    // if redis key is changed, then it needs to be changed in userController as well
     await redis.set(
       `invitation:${token}`,
       JSON.stringify({
