@@ -64,7 +64,9 @@ const getAllSections = async (
     return res.status(400).json({ message: "boardID is required" });
   }
 
-  const cacheData = await redis.get(`sections:${boardID}`);
+  const cacheKey = `section:${boardID}`;
+  
+  const cacheData = await redis.get(cacheKey);
   if (cacheData) {
     const { sections } = JSON.parse(cacheData);
     return res.status(200).json({
@@ -84,7 +86,7 @@ const getAllSections = async (
     });
 
     await redis.set(
-      `sections:${boardID}`,
+      cacheKey,
       JSON.stringify({ sections, createdAt: new Date().toISOString() }),
     );
 
