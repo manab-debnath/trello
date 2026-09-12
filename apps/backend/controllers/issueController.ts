@@ -157,7 +157,6 @@ const getIssues = async (req: Request<{ boardID: string }>, res: Response) => {
       },
       omit: {
         boardId: true,
-        sectionID: true,
       },
       skip: skip,
       take: limit,
@@ -200,7 +199,6 @@ const getIssue = async (req: Request<{ issueID: string }>, res: Response) => {
       },
       omit: {
         boardId: true,
-        sectionID: true,
       },
     });
 
