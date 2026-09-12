@@ -128,4 +128,49 @@ const getIssues = async (req: Request<{ boardID: string }>, res: Response) => {
   }
 };
 
-export { createNewIssue, deleteIssue, getIssues };
+const getIssue = async (req: Request<{ issueID: string }>, res: Response) => {
+  const { issueID } = req.params;
+
+  if (!issueID) {
+    return res.status(400).json({ message: "issueID is required" });
+  }
+
+  try {
+    // get issue from cache
+    const cacheKey = `issue:${issueID}`;
+    const cachedIssue = await redis.get(cacheKey);
+
+    if (cachedIssue) {
+      return res.status(200).json({
+        message: "Issue retrieved successfully",
+        issue: JSON.parse(cachedIssue),
+      });
+    }
+
+    const issue = await prisma.issue.findUnique({
+      where: {
+        id: issueID,
+      },
+      omit: {
+        boardId: true,
+        sectionID: true,
+      },
+    });
+
+    if (!issue) {
+      return res.status(404).json({ message: "Issue not found" });
+    }
+
+    // set cache for 5 minutes
+    await redis.set(cacheKey, JSON.stringify(issue), "EX", 60 * 5);
+
+    return res
+      .status(200)
+      .json({ message: "Issue retrieved successfully", issue });
+  } catch (error) {
+    logger.error({ error }, "Failed to get issue");
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export { createNewIssue, deleteIssue, getIssues, getIssue };

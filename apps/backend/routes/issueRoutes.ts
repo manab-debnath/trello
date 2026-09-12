@@ -1,7 +1,7 @@
 import express from "express";
 import { authMiddleware, requireOrganizationRole } from "../middlewares";
 import { Role } from "db/types";
-import { createNewIssue, deleteIssue, getIssues } from "../controllers";
+import { createNewIssue, deleteIssue, getIssue, getIssues } from "../controllers";
 
 const issueRouter = express.Router({ mergeParams: true });
 
@@ -22,5 +22,7 @@ issueRouter.delete(
 issueRouter.use(requireOrganizationRole(Role.ADMIN, Role.MEMBER));
 
 issueRouter.get("/get-issues", getIssues);
+
+issueRouter.get("/issue/:issueID", getIssue);
 
 export default issueRouter;

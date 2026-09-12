@@ -35,5 +35,6 @@ export {
   createNewIssue,
   deleteIssue,
   getIssues,
+  getIssue,
 } from "./issueController";
 
