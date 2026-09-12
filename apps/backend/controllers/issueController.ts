@@ -90,20 +90,20 @@ const getIssues = async (req: Request<{ boardID: string }>, res: Response) => {
     });
   }
 
-  // Get cached issues
-  const cacheKey = `issues:${boardID}:${page}:${limit}`;
-  const cachedIssues = await redis.get(cacheKey);
-
-  if (cachedIssues) {
-    return res.status(200).json({
-      message: "Issues retrieved successfully",
-      issues: JSON.parse(cachedIssues),
-    });
-  }
-
-  const skip = (page - 1) * limit;
-
   try {
+    // Get cached issues
+    const cacheKey = `issues:${boardID}:${page}:${limit}`;
+    const cachedIssues = await redis.get(cacheKey);
+
+    if (cachedIssues) {
+      return res.status(200).json({
+        message: "Issues retrieved successfully",
+        issues: JSON.parse(cachedIssues),
+      });
+    }
+
+    const skip = (page - 1) * limit;
+
     const issues = await prisma.issue.findMany({
       where: {
         boardId: boardID,
