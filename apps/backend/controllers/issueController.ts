@@ -67,6 +67,53 @@ const deleteIssue = async (
   }
 };
 
+const updateIssue = async (
+  req: Request<{ orgID: string; boardID: string; issueID: string }>,
+  res: Response,
+) => {
+  const { boardID, issueID } = req.params;
+  const { title, description, sectionID } = req.body;
+
+  if (!issueID || !boardID) {
+    return res
+      .status(400)
+      .json({ message: "issueID and boardID are required" });
+  }
+
+  if (!title && !description && !sectionID) {
+    return res.status(400).json({ message: "No fields to update" });
+  }
+
+  try {
+    const updatedIssue = await prisma.issue.update({
+      where: {
+        id: issueID,
+        boardId: boardID,
+      },
+      data: {
+        title,
+        description,
+        sectionID,
+      },
+      omit: {
+        boardId: true,
+      },
+    });
+
+    const cachedIssue = await redis.get(`issue:${issueID}`);
+    if (cachedIssue) {
+      await redis.del(`issue:${issueID}`);
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Issue updated successfully", updatedIssue });
+  } catch (error) {
+    logger.error({ error }, "Failed to update issue");
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const getIssues = async (req: Request<{ boardID: string }>, res: Response) => {
   const { boardID } = req.params;
 
@@ -173,4 +220,4 @@ const getIssue = async (req: Request<{ issueID: string }>, res: Response) => {
   }
 };
 
-export { createNewIssue, deleteIssue, getIssues, getIssue };
+export { createNewIssue, deleteIssue, updateIssue, getIssues, getIssue };
