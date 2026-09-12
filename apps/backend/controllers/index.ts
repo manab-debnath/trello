@@ -30,3 +30,8 @@ export {
   createSection,
   getAllSections,
 } from "./sectionController";
+
+export {
+  createNewIssue,
+} from "./issueController";
+
