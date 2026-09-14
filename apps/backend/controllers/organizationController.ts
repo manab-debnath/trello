@@ -243,10 +243,74 @@ const sendInvitation = async (
   }
 };
 
+const removeUserFromOrganization = async (
+  req: Request<{ orgID: string }>,
+  res: Response,
+) => {
+  const { orgID } = req.params;
+  const { userIDs } = req.body; 
+
+  if (!Array.isArray(userIDs) || userIDs.length === 0) {
+    return res.status(400).json({ message: "No users to remove" });
+  }
+
+  if (userIDs.includes(req.user.id)) {
+    return res.status(400).json({ message: "You cannot remove yourself" });
+  }
+
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      const organizationUser = await tx.organizationUser.findMany({
+        where: {
+          organizationID: orgID,
+          userID: {
+            in: userIDs,
+          },
+        },
+        select: {
+          userID: true,
+        },
+      });
+
+      if (userIDs.length !== organizationUser.length) {
+        throw new Error("Some users were not found");
+      }
+
+      return await tx.organizationUser.deleteMany({
+        where: {
+          organizationID: orgID,
+          userID: {
+            in: userIDs,
+          },
+        },
+      });
+    });
+
+    if (result.count === 0) {
+      return res.status(404).json({ message: "No users found to remove" });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Users removed successfully", count: result.count });
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "Some users were not found"
+    ) {
+      return res.status(404).json({ message: error.message });
+    }
+
+    logger.error({ error }, "Error removing user from organization");
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export {
   createOrganization,
   getAllOrganizations,
   getOrganizationById,
   deleteOrganizationById,
   sendInvitation,
+  removeUserFromOrganization,
 };
