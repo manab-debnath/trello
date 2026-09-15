@@ -306,6 +306,61 @@ const removeUserFromOrganization = async (
   }
 };
 
+const leaveOrganization = async (
+  req: Request<{ orgID: string }>,
+  res: Response,
+) => {
+  const { orgID } = req.params;
+
+  if (!orgID) {
+    return res.status(400).json({
+      message: "Organization ID is required",
+    });
+  }
+
+  try {
+    const organizationUser = await prisma.organizationUser.findUnique({
+      where: {
+        userID_organizationID: {
+          userID: req.user.id,
+          organizationID: orgID,
+        },
+      },
+    });
+
+    if (!organizationUser) {
+      return res.status(404).json({
+        message: "User not found in organization",
+      });
+    }
+
+    if (organizationUser.role === Role.ADMIN) {
+      return res.status(403).json({
+        message: "Cannot leave organization as admin",
+      });
+    }
+
+    await prisma.organizationUser.delete({
+      where: {
+        userID_organizationID: {
+          userID: req.user.id as string,
+          organizationID: orgID,
+        },
+      },
+    });
+
+    return res.status(200).json({
+      message: "User left organization successfully",
+    });
+  } catch (error) {
+    logger.error({ error }, "Error leaving organization");
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
 export {
   createOrganization,
   getAllOrganizations,
@@ -313,4 +368,5 @@ export {
   deleteOrganizationById,
   sendInvitation,
   removeUserFromOrganization,
+  leaveOrganization,
 };

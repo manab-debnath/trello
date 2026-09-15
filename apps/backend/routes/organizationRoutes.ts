@@ -4,6 +4,7 @@ import {
 	deleteOrganizationById,
 	getAllOrganizations,
 	getOrganizationById,
+	leaveOrganization,
 	removeUserFromOrganization,
 	sendInvitation,
 } from "../controllers";
@@ -40,6 +41,12 @@ organizationRouter.delete(
 	"/:orgID/members",
 	requireOrganizationRole(Role.ADMIN),
 	removeUserFromOrganization,
+);
+
+organizationRouter.delete(
+	"/:orgID/members/:userID",
+	requireOrganizationRole(Role.ADMIN, Role.MEMBER),
+	leaveOrganization,
 );
 
 export default organizationRouter;

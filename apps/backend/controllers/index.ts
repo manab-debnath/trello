@@ -17,6 +17,7 @@ export {
   deleteOrganizationById,
   sendInvitation,
   removeUserFromOrganization,
+  leaveOrganization,
 } from "./organizationController";
 
 export {
