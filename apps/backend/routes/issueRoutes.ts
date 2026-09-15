@@ -2,6 +2,7 @@ import express from "express";
 import { authMiddleware, requireOrganizationRole } from "../middlewares";
 import { Role } from "db/types";
 import {
+  assignIssueToUser,
   createNewIssue,
   deleteIssue,
   getIssue,
@@ -29,6 +30,12 @@ issueRouter.patch(
   "/update-issue/:issueID",
   requireOrganizationRole(Role.ADMIN),
   updateIssue,
+);
+
+issueRouter.post(
+  "/issues/:issueID/assignees",
+  requireOrganizationRole(Role.ADMIN),
+  assignIssueToUser,
 );
 
 issueRouter.use(requireOrganizationRole(Role.ADMIN, Role.MEMBER));
