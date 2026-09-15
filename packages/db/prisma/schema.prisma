@@ -160,6 +160,7 @@ model IssueUser {
   user  User  @relation(fields: [userID], references: [id])
 
   @@map("issue_user")
+  @@unique([issueID, userID])
 }
 
 model Comment {
