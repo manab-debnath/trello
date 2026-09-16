@@ -218,4 +218,68 @@ const getIssue = async (req: Request<{ issueID: string }>, res: Response) => {
   }
 };
 
-export { createNewIssue, deleteIssue, updateIssue, getIssues, getIssue };
+const assignIssueToUser = async (
+  req: Request<{ orgID: string; issueID: string }>,
+  res: Response,
+) => {
+  const { orgID, issueID } = req.params;
+  const { userIDs } = req.body;
+
+  if (!issueID) {
+    return res.status(400).json({ message: "issueID are required" });
+  }
+
+  if (!Array.isArray(userIDs) || userIDs.length === 0) {
+    return res.status(400).json({ message: "userIDs are required" });
+  }
+
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      const organizationUser = await tx.organizationUser.findMany({
+        where: {
+          organizationID: orgID,
+          userID: {
+            in: userIDs,
+          },
+        },
+        select: { userID: true },
+      });
+
+      if (userIDs.length !== organizationUser.length) {
+        throw new Error("Some users are not part of the organization");
+      }
+
+      const assignUser = await prisma.issueUser.createMany({
+        data: userIDs.map((userID: string) => ({
+          issueID,
+          userID,
+        })),
+        skipDuplicates: true,
+      });
+
+      return assignUser;
+    });
+
+    return res
+      .status(200)
+      .json({ message: "Users assigned successfully", result });
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "Some users are not part of the organization"
+    ) {
+      return res.status(400).json({ message: error.message });
+    }
+    logger.error({ error }, "Failed to assign user to issue");
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export {
+  createNewIssue,
+  deleteIssue,
+  updateIssue,
+  getIssues,
+  getIssue,
+  assignIssueToUser,
+};
