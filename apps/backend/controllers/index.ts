@@ -40,5 +40,6 @@ export {
   getIssue,
   updateIssue,
   assignIssueToUser,
+  removeUserFromAssignedIssue,
 } from "./issueController";
 

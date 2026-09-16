@@ -7,6 +7,7 @@ import {
   deleteIssue,
   getIssue,
   getIssues,
+  removeUserFromAssignedIssue,
   updateIssue,
 } from "../controllers";
 
@@ -36,6 +37,12 @@ issueRouter.post(
   "/issues/:issueID/assignees",
   requireOrganizationRole(Role.ADMIN),
   assignIssueToUser,
+);
+
+issueRouter.delete(
+  "/issues/:issueID/assignees",
+  requireOrganizationRole(Role.ADMIN),
+  removeUserFromAssignedIssue,
 );
 
 issueRouter.use(requireOrganizationRole(Role.ADMIN, Role.MEMBER));

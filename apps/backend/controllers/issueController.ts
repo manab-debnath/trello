@@ -275,6 +275,57 @@ const assignIssueToUser = async (
   }
 };
 
+const removeUserFromAssignedIssue = async (
+  req: Request<{ orgID: string; issueID: string }>,
+  res: Response,
+) => {
+  const { orgID, issueID } = req.params;
+  const { userIDs } = req.body;
+
+  if (!issueID) {
+    return res.status(400).json({ message: "issueID is required" });
+  }
+
+  if (!Array.isArray(userIDs) || userIDs.length === 0) {
+    return res
+      .status(400)
+      .json({ message: "userIDs is required and must be an array" });
+  }
+
+  try {
+    const organizationUser = await prisma.organizationUser.findMany({
+      where: {
+        organizationID: orgID,
+        userID: {
+          in: userIDs,
+        },
+      },
+    });
+
+    if (organizationUser.length !== userIDs.length) {
+      return res
+        .status(404)
+        .json({ message: "Some users are not part of the organization" });
+    }
+
+    const result = await prisma.issueUser.deleteMany({
+      where: {
+        issueID,
+        userID: {
+          in: userIDs,
+        },
+      },
+    });
+
+    return res
+      .status(200)
+      .json({ message: "User removed from issue successfully", result });
+  } catch (error) {
+    logger.error({ error }, "Failed to remove user from issue");
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export {
   createNewIssue,
   deleteIssue,
@@ -282,4 +333,5 @@ export {
   getIssues,
   getIssue,
   assignIssueToUser,
+  removeUserFromAssignedIssue,
 };
