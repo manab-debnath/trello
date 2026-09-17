@@ -1,6 +1,9 @@
 import type { Request, Response } from "express";
-import { logger } from "..";
+import { logger, redis } from "..";
 import { prisma } from "db/client";
+import type { Comment } from "db/types";
+
+const QUERY_KEY = "comments";
 
 const createComment = async (
   req: Request<{ orgID: string; issueID: string }>,
@@ -51,4 +54,91 @@ const createComment = async (
   }
 };
 
-export { createComment };
+const getAllComments = async (
+  req: Request<{ orgID: string; issueID: string }>,
+  res: Response,
+) => {
+  const { orgID, issueID } = req.params;
+
+  if (!orgID || !issueID) {
+    return res.status(400).json({ message: "Invalid URL parameters" });
+  }
+
+  try {
+    // fetch comments from cache
+    const cache = await redis.get(QUERY_KEY);
+    if (cache) {
+      const cachedComments = JSON.parse(cache);
+      return res.status(200).json({
+        message: "Comments retrieved successfully",
+        comments: cachedComments,
+      });
+    }
+
+    const comments = await prisma.comment.findMany({
+      where: {
+        issueID,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+
+    const commentTree = buildCommentTree(comments);
+
+    // add comments to cache
+    await redis.set(
+      QUERY_KEY,
+      JSON.stringify({ comments: commentTree, createdAt: new Date() }),
+      "EX",
+      60 * 60 * 24 * 7,
+    );
+
+    return res.status(200).json({
+      message: "Comments retrieved successfully",
+      comments: commentTree,
+    });
+  } catch (error) {
+    logger.error({ error }, "Failed to get comments");
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const buildCommentTree = (comments: Comment[]) => {
+  const commentMap = new Map();
+
+  for (const comment of comments) {
+    commentMap.set(comment.id, {
+      ...comment,
+      replies: [],
+    });
+  }
+
+  const rootComments = [];
+
+  for (const comment of comments) {
+    const current = commentMap.get(comment.id);
+
+    if (current.parentID) {
+      const parent = commentMap.get(current.parentID);
+
+      if (parent) {
+        parent.replies.push(current);
+      }
+    } else {
+      rootComments.push(current);
+    }
+  }
+
+  return rootComments;
+};
+
+export { createComment, getAllComments };
