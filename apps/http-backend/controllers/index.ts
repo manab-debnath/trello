@@ -46,4 +46,6 @@ export {
 export {
   createComment,
   getAllComments,
+  updateComment,
+  deleteComment,
 } from "./commentController";

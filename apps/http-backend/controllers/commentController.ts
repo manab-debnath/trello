@@ -112,6 +112,95 @@ const getAllComments = async (
   }
 };
 
+const updateComment = async (
+  req: Request<{ orgID: string; issueID: string; commentID: string }>,
+  res: Response,
+) => {
+  const { orgID, issueID, commentID } = req.params;
+  const { content } = req.body;
+
+  try {
+    const comment = await prisma.comment.findUnique({
+      where: { id: commentID, issueID },
+      include: {
+        user: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    } else {
+      if (comment.user.id !== req.user.id) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+    }
+
+    const updatedComment = await prisma.comment.update({
+      where: { id: commentID, issueID },
+      data: { content },
+    });
+
+    // delete comment cache
+    await redis.del(QUERY_KEY);
+
+    return res.status(200).json({
+      message: "Comment updated successfully",
+      comment: updatedComment,
+    });
+  } catch (error) {
+    logger.error({ error }, "Failed to update comment");
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const deleteComment = async (
+  req: Request<{ orgID: string; issueID: string; commentID: string }>,
+  res: Response,
+) => {
+  const { orgID, issueID, commentID } = req.params;
+
+  if (!orgID || !issueID || !commentID) {
+    return res.status(400).json({ message: "Invalid URL parameters" });
+  }
+
+  try {
+    const comment = await prisma.comment.findUnique({
+      where: { id: commentID, issueID },
+      include: {
+        user: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    } else {
+      if (comment.user.id !== req.user.id) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+    }
+
+    await prisma.comment.delete({
+      where: { id: commentID, issueID },
+    });
+
+    // delete comment from cache
+    await redis.del(QUERY_KEY);
+
+    return res.status(200).json({ message: "Comment deleted successfully" });
+  } catch (error) {
+    logger.error({ error }, "Failed to delete comment");
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const buildCommentTree = (comments: Comment[]) => {
   const commentMap = new Map();
 
@@ -141,4 +230,4 @@ const buildCommentTree = (comments: Comment[]) => {
   return rootComments;
 };
 
-export { createComment, getAllComments };
+export { createComment, getAllComments, updateComment, deleteComment };
