@@ -43,3 +43,6 @@ export {
   removeUserFromAssignedIssue,
 } from "./issueController";
 
+export {
+  createComment,
+} from "./commentController";

@@ -3,3 +3,4 @@ export { default as organizationRouter } from "./organizationRoutes";
 export { default as boardRouter } from "./boardRoutes";
 export { default as sectionRoutes } from "./sectionRoutes";
 export { default as issueRouter } from "./issueRoutes";
+export { default as commentRouter } from "./commentRoutes";

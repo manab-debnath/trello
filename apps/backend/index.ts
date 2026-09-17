@@ -5,6 +5,7 @@ import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
 import { auth } from "./config/auth";
 import {
   boardRouter,
+  commentRouter,
   issueRouter,
   organizationRouter,
   sectionRoutes,
@@ -70,6 +71,10 @@ app.use("/api/organizations", organizationRouter);
 app.use("/api/organization/:orgID", boardRouter);
 app.use("/api/organization/:orgID/board/:boardID", sectionRoutes);
 app.use("/api/organization/:orgID/board/:boardID", issueRouter);
+app.use(
+  "/api/organizations/:orgID/boards/:boardID/issues/:issueID",
+  commentRouter,
+);
 
 app.listen(port, () => {
   console.log(`Trello app listening on port ${port}`);
