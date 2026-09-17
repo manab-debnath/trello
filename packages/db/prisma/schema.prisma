@@ -84,6 +84,8 @@ model Organization {
   id          String @id @default(uuid())
   name        String
   description String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 
   organization_users OrganizationUser[]
   boards             Board[]
@@ -96,6 +98,8 @@ model OrganizationUser {
   id   String @id @default(uuid())
   role Role   @default(MEMBER)
   accepted Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 
   userID         String
   organizationID String
@@ -110,6 +114,8 @@ model OrganizationUser {
 model Board {
   id    String @id @default(uuid())
   title String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 
   organizationID String
   organization   Organization @relation(fields: [organizationID], references: [id], onDelete: Cascade)
@@ -124,6 +130,8 @@ model Issue {
   id          String @id @default(uuid())
   title       String
   description String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 
   issueUsers IssueUser[]
   comments   Comment[]
@@ -140,6 +148,8 @@ model Issue {
 model Section {
   id     String      @id @default(uuid())
   status IssueStatus @default(OPEN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 
   boardId String
   board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
@@ -152,6 +162,8 @@ model Section {
 
 model IssueUser {
   id String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 
   issueID String
   userID  String
@@ -166,6 +178,9 @@ model IssueUser {
 model Comment {
   id      String @id @default(uuid())
   content String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  
 
   userID  String
   issueID String
@@ -185,6 +200,7 @@ model Comment {
 model PendingMember {
   id String @id @default(uuid())
   email String @unique
+  createdAt DateTime @default(now())
 
   organizationID String
   organization   Organization @relation(fields: [organizationID], references: [id], onDelete: Cascade)
