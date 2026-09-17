@@ -119,6 +119,10 @@ const updateComment = async (
   const { orgID, issueID, commentID } = req.params;
   const { content } = req.body;
 
+  if (!orgID || !issueID || !commentID) {
+    return res.status(400).json({ message: "Invalid URL parameters" });
+  }
+
   try {
     const comment = await prisma.comment.findUnique({
       where: { id: commentID, issueID },
