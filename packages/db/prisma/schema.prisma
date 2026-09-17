@@ -169,9 +169,14 @@ model Comment {
 
   userID  String
   issueID String
+  parentID String?
 
   user  User  @relation(fields: [userID], references: [id], onDelete: Cascade)
   issue Issue @relation(fields: [issueID], references: [id], onDelete: Cascade)
+
+  // Self-relation
+  parent Comment? @relation("CommentReplies", fields: [parentID], references: [id], onDelete: Cascade)
+  replies Comment[] @relation("CommentReplies")
 
   @@map("comment")
 }
