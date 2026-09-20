@@ -28,10 +28,10 @@ boardRoutes.get(
 // Only admins can create, update, and delete boards
 boardRoutes.use(requireOrganizationRole(Role.ADMIN));
 
-boardRoutes.post("/create-board", createBoard);
+boardRoutes.post("/boards", createBoard);
 
-boardRoutes.patch("/boards/update-board/:boardID", updateBoard);
+boardRoutes.patch("/boards/:boardID", updateBoard);
 
-boardRoutes.delete("/boards/delete-board/:boardID", deleteBoard);
+boardRoutes.delete("/boards/:boardID", deleteBoard);
 
 export default boardRoutes;

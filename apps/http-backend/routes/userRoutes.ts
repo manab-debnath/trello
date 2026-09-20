@@ -26,13 +26,13 @@ userRouter.get("/profile", (req, res) => {
   res.json(user);
 });
 
-userRouter.patch("/update-profile", changeUserInfo);
+userRouter.patch("/profile", changeUserInfo);
 
 userRouter.patch("/change-email", changeEmail);
 
 userRouter.patch("/change-password", changePassword);
 
-userRouter.delete("/delete-account", deleteAccount);
+userRouter.delete("/profile", deleteAccount);
 
 userRouter.post("/sign-out", signOut);
 

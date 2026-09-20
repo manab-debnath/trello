@@ -7,7 +7,7 @@ const sectionRoutes = express.Router({ mergeParams: true });
 
 sectionRoutes.use(authMiddleware, requireOrganizationRole(Role.ADMIN));
 
-sectionRoutes.post("/create-section", createSection);
+sectionRoutes.post("/sections", createSection);
 
 sectionRoutes.get("/sections", getAllSections);
 

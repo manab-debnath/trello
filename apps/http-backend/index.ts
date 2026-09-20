@@ -66,11 +66,11 @@ app.get("/reset-password", (req, res) => {
   });
 });
 
-app.use("/api/user", userRouter);
-app.use("/api/organizations", organizationRouter);
-app.use("/api/organization/:orgID", boardRouter);
-app.use("/api/organization/:orgID/board/:boardID", sectionRoutes);
-app.use("/api/organization/:orgID/board/:boardID", issueRouter);
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/organizations", organizationRouter);
+app.use("/api/v1/organizations/:orgID", boardRouter);
+app.use("/api/v1/organizations/:orgID/boards/:boardID", sectionRoutes);
+app.use("/api/v1/organizations/:orgID/boards/:boardID", issueRouter);
 app.use(
   "/api/organizations/:orgID/boards/:boardID/issues/:issueID",
   commentRouter,
