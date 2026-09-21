@@ -2,7 +2,7 @@ import "dotenv/config";
 import { betterAuth } from "better-auth/minimal";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "db/client";
-import { logger } from "..";
+import { logger } from "../app";
 import type { EmailHeader } from "types";
 import { emailQueue } from "queue/email-queue";
 

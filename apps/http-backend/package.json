@@ -4,13 +4,16 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun run --watch index.ts"
+    "dev": "bun run --watch server.ts",
+    "test:vitest": "vitest run --config vitest.config.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/supertest": "^7.2.1",
     "logger": "*",
+    "supertest": "^7.2.2",
     "vitest": "^5.0.1"
   },
   "peerDependencies": {

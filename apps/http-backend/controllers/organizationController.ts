@@ -1,7 +1,7 @@
 import { prisma } from "db/client";
 import type { Request, Response } from "express";
 import { Role } from "../../../packages/db/generated/prisma/enums";
-import { logger, redis } from "..";
+import { logger, redis } from "../app";
 import { emailQueue } from "queue/email-queue";
 import type { EmailHeader } from "types";
 import crypto from "node:crypto";

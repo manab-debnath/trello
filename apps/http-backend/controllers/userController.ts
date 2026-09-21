@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { auth } from "../config/auth";
 import { fromNodeHeaders } from "better-auth/node";
-import { logger, redis } from "..";
+import { logger, redis } from "../app";
 import { prisma } from "db/client";
 
 const changeUserInfo = async (req: Request, res: Response) => {

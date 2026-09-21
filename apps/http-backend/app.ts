@@ -15,7 +15,6 @@ import { createHttpLogger, createLogger } from "logger";
 import Redis from "ioredis";
 
 const app = express();
-const port = process.env.PORT;
 export const redis = new Redis(process.env.REDIS_URL as string);
 
 export const logger = createLogger("backend");
@@ -43,10 +42,10 @@ app.get("/", (req, res) => {
   });
 });
 
-app.get("/api/health", (req, res) => {
+app.get("/api/v1/health", (req, res) => {
   res.status(200).json({
-    success: true,
-    health: "OK",
+    status: "OK",
+    dynamic: true,
   });
 });
 
@@ -76,6 +75,4 @@ app.use(
   commentRouter,
 );
 
-app.listen(port, () => {
-  console.log(`Trello app listening on port ${port}`);
-});
+export default app;

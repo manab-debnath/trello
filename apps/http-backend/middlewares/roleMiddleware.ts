@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import type { Role } from "db/types";
 import { prisma } from "db/client";
-import { logger } from "..";
+import { logger } from "../app";
 
 const requireOrganizationRole = (...roles: Role[]) => {
   return async (
