@@ -10,7 +10,8 @@
     "@types/bun": "latest",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "logger": "*"
+    "logger": "*",
+    "vitest": "^5.0.1"
   },
   "peerDependencies": {
     "typescript": "^5"
