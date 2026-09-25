@@ -1,6 +1,7 @@
 import { IssueStatus } from "db/types";
 import type { Request, Response } from "express";
-import { logger, redis } from "../app";
+import { redis } from "../app";
+import { logger } from "../logger";
 import { prisma } from "db/client";
 import { Prisma } from "../../../packages/db/generated/prisma/client";
 

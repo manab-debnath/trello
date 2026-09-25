@@ -11,14 +11,10 @@ import {
   sectionRoutes,
   userRouter,
 } from "./routes";
-import { createHttpLogger, createLogger } from "logger";
 import Redis from "ioredis";
 
 const app = express();
 export const redis = new Redis(process.env.REDIS_URL as string);
-
-export const logger = createLogger("backend");
-const httpLogger = createHttpLogger(logger);
 
 // Configure CORS middleware
 app.use(

@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
-import { logger, redis } from "../app";
+import { redis } from "../app";
+import { logger } from "../logger";
 import { prisma } from "db/client";
 import type { Comment } from "db/types";
 

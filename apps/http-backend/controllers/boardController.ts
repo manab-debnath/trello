@@ -1,6 +1,6 @@
 import { prisma } from "db/client";
 import type { Request, Response } from "express";
-import { logger } from "../app";
+import { logger } from "../logger";
 
 const getAllBoards = async (req: Request, res: Response) => {
   const { orgID } = req.params;
