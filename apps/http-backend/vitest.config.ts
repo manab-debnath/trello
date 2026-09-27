@@ -1,4 +1,9 @@
+import dotenv from "dotenv";
 import { defineConfig } from "vitest/config";
+
+dotenv.config({
+  path: ".env.test.local",
+});
 
 export default defineConfig({
   test: {
@@ -8,5 +13,8 @@ export default defineConfig({
     // Target only integration test files
     include: ["tests/**/*.test.ts"],
     environment: "node",
+    env: {
+      NODE_ENV: "test",
+    },
   },
 });
