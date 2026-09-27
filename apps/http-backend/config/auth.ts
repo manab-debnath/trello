@@ -7,6 +7,7 @@ import type { EmailHeader } from "types";
 import { emailQueue } from "queue/email-queue";
 import { APIError } from "better-auth/api";
 import { createAuthMiddleware } from "better-auth/api";
+import { testUtils } from "better-auth/plugins";
 
 const emailFrom = process.env.EMAIL_FROM || "manab_debnath@nextstudio.tech";
 
@@ -81,4 +82,5 @@ export const auth = betterAuth({
     },
   },
   baseURL: "http://localhost:8000",
+  plugins: [...(process.env.NODE_ENV === "test" ? [testUtils()] : [])],
 });

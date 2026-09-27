@@ -1,4 +1,5 @@
 import { beforeAll, afterAll, describe, expect, it, vi } from "vitest";
+import request from "supertest";
 
 vi.mock("queue/email-queue", () => ({
   emailQueue: {
@@ -8,7 +9,7 @@ vi.mock("queue/email-queue", () => ({
 
 import { auth } from "../config/auth";
 import { prisma } from "db/client";
-import { fromNodeHeaders } from "better-auth/node";
+import app from "../app";
 
 // -----------------------------------------------------------------------------
 // Test configuration
@@ -62,31 +63,30 @@ describe("Authentication", () => {
   // ---------------------------------------------------------------------------
 
   it("should create a new user", async () => {
-    const response = await auth.api.signUpEmail({
-      body: {
-        name: TEST_USER.name,
-        email: TEST_USER.email,
-        password: TEST_USER.password,
-      },
+    const response = await request(app).post("/api/auth/sign-up/email").send({
+      name: TEST_USER.name,
+      email: TEST_USER.email,
+      password: TEST_USER.password,
     });
 
     expect(response).toBeDefined();
-    expect(response.user).toBeDefined();
+    expect(response.status).toBe(200);
 
-    expect(response.user.email).toBe(TEST_USER.email);
-    expect(response.user.name).toBe(TEST_USER.name);
+    const { user, name } = response.body;
+
+    expect(user.email).toBe(TEST_USER.email);
+    expect(user.name).toBe(TEST_USER.name);
   });
 
   it("should not allow duplicate email registration", async () => {
-    await expect(
-      auth.api.signUpEmail({
-        body: {
-          name: "Another User",
-          email: TEST_USER.email,
-          password: TEST_USER.password,
-        },
-      }),
-    ).rejects.toThrow();
+    const res = await request(app).post("/api/auth/sign-up/email").send({
+      name: "Another User",
+      email: TEST_USER.email,
+      password: TEST_USER.password,
+    });
+
+    expect(res.status).toBe(409);
+    expect(res.body.code).toBe("USER_ALREADY_EXISTS");
   });
 
   // ---------------------------------------------------------------------------
