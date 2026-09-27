@@ -25,7 +25,7 @@ app.use(
   }),
 );
 
-app.all("/api/auth/*splat", toNodeHandler(auth));
+app.all("/api/auth/*splat", toNodeHandler(auth) as any);
 
 app.use(express.json());
 // app.use(httpLogger)
