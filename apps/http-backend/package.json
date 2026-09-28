@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "bun run --watch server.ts",
-    "test:integration": "vitest run --config vitest.config.ts"
+    "test:integration": "../../scripts/run-integration.sh"
   },
   "devDependencies": {
     "@types/bun": "latest",
