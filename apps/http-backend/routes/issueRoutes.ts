@@ -16,19 +16,19 @@ const issueRouter = express.Router({ mergeParams: true });
 issueRouter.use(authMiddleware);
 
 issueRouter.post(
-  "/create-issue",
+  "/issues",
   requireOrganizationRole(Role.ADMIN),
   createNewIssue,
 );
 
 issueRouter.delete(
-  "/delete-issue/:issueID",
+  "/issues/:issueID",
   requireOrganizationRole(Role.ADMIN),
   deleteIssue,
 );
 
 issueRouter.patch(
-  "/update-issue/:issueID",
+  "/issues/:issueID",
   requireOrganizationRole(Role.ADMIN),
   updateIssue,
 );
@@ -47,8 +47,8 @@ issueRouter.delete(
 
 issueRouter.use(requireOrganizationRole(Role.ADMIN, Role.MEMBER));
 
-issueRouter.get("/get-issues", getIssues);
+issueRouter.get("/issues", getIssues);
 
-issueRouter.get("/issue/:issueID", getIssue);
+issueRouter.get("/issues/:issueID", getIssue);
 
 export default issueRouter;

@@ -4,19 +4,23 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun run --watch index.ts"
+    "dev": "bun run --watch server.ts",
+    "test:integration": "../../scripts/run-integration.sh"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "logger": "*"
+    "@types/supertest": "^7.2.1",
+    "logger": "*",
+    "supertest": "^7.2.2",
+    "vitest": "^5.0.1"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
-    "better-auth": "^1.7.1",
+    "better-auth": "^1.7.6",
     "cors": "^2.8.6",
     "db": "*",
     "dotenv": "^17.4.2",

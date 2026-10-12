@@ -11,30 +11,25 @@ import {
   sectionRoutes,
   userRouter,
 } from "./routes";
-import { createHttpLogger, createLogger } from "logger";
 import Redis from "ioredis";
 
 const app = express();
-const port = process.env.PORT;
 export const redis = new Redis(process.env.REDIS_URL as string);
-
-export const logger = createLogger("backend");
-const httpLogger = createHttpLogger(logger);
 
 // Configure CORS middleware
 app.use(
   cors({
     origin: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   }),
 );
 
-app.all("/api/auth/*splat", toNodeHandler(auth));
+app.all("/api/auth/*splat", toNodeHandler(auth) as any);
 
 app.use(express.json());
 // app.use(httpLogger)
-// app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -43,10 +38,10 @@ app.get("/", (req, res) => {
   });
 });
 
-app.get("/api/health", (req, res) => {
+app.get("/api/v1/health", (req, res) => {
   res.status(200).json({
-    success: true,
-    health: "OK",
+    status: "OK",
+    dynamic: true,
   });
 });
 
@@ -66,16 +61,14 @@ app.get("/reset-password", (req, res) => {
   });
 });
 
-app.use("/api/user", userRouter);
-app.use("/api/organizations", organizationRouter);
-app.use("/api/organization/:orgID", boardRouter);
-app.use("/api/organization/:orgID/board/:boardID", sectionRoutes);
-app.use("/api/organization/:orgID/board/:boardID", issueRouter);
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/organizations", organizationRouter);
+app.use("/api/v1/organizations/:orgID", boardRouter);
+app.use("/api/v1/organizations/:orgID/boards/:boardID", sectionRoutes);
+app.use("/api/v1/organizations/:orgID/boards/:boardID", issueRouter);
 app.use(
   "/api/organizations/:orgID/boards/:boardID/issues/:issueID",
   commentRouter,
 );
 
-app.listen(port, () => {
-  console.log(`Trello app listening on port ${port}`);
-});
+export default app;

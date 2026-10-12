@@ -15,24 +15,24 @@ const organizationRouter = express.Router();
 
 organizationRouter.use(authMiddleware);
 
-organizationRouter.post("/create-organization", createOrganization);
+organizationRouter.post("/", createOrganization);
 
-organizationRouter.get("/all", getAllOrganizations);
+organizationRouter.get("/", getAllOrganizations);
 
 organizationRouter.get(
-	"/organization/:orgID",
+	"/:orgID",
 	requireOrganizationRole(Role.ADMIN, Role.MEMBER),
 	getOrganizationById,
 );
 
 organizationRouter.delete(
-	"/organization/:orgID",
+	"/:orgID",
 	requireOrganizationRole(Role.ADMIN),
 	deleteOrganizationById,
 );
 
 organizationRouter.post(
-	"/invite/:orgID",
+	"/:orgID/invite",
 	requireOrganizationRole(Role.ADMIN),
 	sendInvitation,
 );
