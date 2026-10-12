@@ -1,12 +1,30 @@
 import { Route, Routes, useParams } from "react-router";
 import "./App.css";
 import { useEffect, useState } from "react";
+import { Login } from "./pages/login";
+import { SignUp } from "./pages/sign-up";
 
 function App() {
   return (
-    <div>
+    <div className="w-full h-screen">
       <Routes>
         <Route path="/boards/:boardID" element={<Board />} />
+        <Route
+          path="/sign-up"
+          element={
+            <div className="flex w-full h-screen justify-center items-center">
+              <SignUp />
+            </div>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <div className="flex w-full h-screen justify-center items-center">
+              <Login />
+            </div>
+          }
+        />
       </Routes>
     </div>
   );
