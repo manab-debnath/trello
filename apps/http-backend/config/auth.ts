@@ -82,5 +82,6 @@ export const auth = betterAuth({
     },
   },
   baseURL: "http://localhost:8000",
+  trustedOrigins: ["http://localhost:5173"],
   plugins: [...(process.env.NODE_ENV === "test" ? [testUtils()] : [])],
 });
