@@ -1,30 +1,58 @@
-import { Route, Routes, useParams } from "react-router";
+import { Navigate, Route, Routes, useParams } from "react-router";
 import "./App.css";
 import { useEffect, useState } from "react";
-import { Login } from "./pages/login";
-import { SignUp } from "./pages/sign-up";
+import { Login } from "./pages/Login";
+import { SignUp } from "./pages/SignUp";
+import { Toaster } from "./components/ui/toast";
+import { GuestRoute } from "./components/GuestRoute";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { Spinner } from "./components/ui/spinner";
+import { authClient } from "./lib/auth-client";
+import { MainLayout } from "./layout/MainLayout";
+import { Organization } from "./pages/Organization";
 
 function App() {
+  const { isPending } = authClient.useSession();
+
+  if (isPending) {
+    return <Spinner />;
+  }
+
   return (
     <div className="w-full h-screen">
+      <div className="w-full flex justify-center">
+        <Toaster />
+      </div>
       <Routes>
-        <Route path="/boards/:boardID" element={<Board />} />
-        <Route
-          path="/sign-up"
-          element={
-            <div className="flex w-full h-screen justify-center items-center">
-              <SignUp />
-            </div>
-          }
-        />
-        <Route
-          path="/login"
-          element={
-            <div className="flex w-full h-screen justify-center items-center">
-              <Login />
-            </div>
-          }
-        />
+        <Route path="/" element={<Navigate to="/organizations" replace />} />
+
+        {/* Only unauthenticated users */}
+        <Route element={<GuestRoute />}>
+          <Route
+            path="/sign-up"
+            element={
+              <div className="flex w-full h-screen justify-center items-center">
+                <SignUp />
+              </div>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <div className="flex w-full h-screen justify-center items-center">
+                <Login />
+              </div>
+            }
+          />
+        </Route>
+
+        {/* Only authenticated users */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<MainLayout />}>
+            <Route path="/organizations" element={<Organization />} />
+            <Route path="/boards/:boardID" element={<Board />} />
+          </Route>
+        </Route>
       </Routes>
     </div>
   );

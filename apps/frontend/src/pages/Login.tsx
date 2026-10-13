@@ -9,32 +9,39 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "@/components/ui/toast"
-import { Link } from "react-router";
+import { toast } from "@/components/ui/toast";
+import { Link, useNavigate } from "react-router";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import axios from "axios";
+import { authClient } from "@/lib/auth-client";
 
 interface LoginInputs {
   email: string;
   password: string;
 }
 
-const apiUrl = import.meta.env.VITE_API_URL;
-
 export const Login = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginInputs>();
   const onSubmit: SubmitHandler<LoginInputs> = async (data) => {
-    const result = await axios.post(apiUrl + "api/auth/sign-in/email", {
-      ...data,
+    const { error } = await authClient.signIn.email({
+      email: data.email,
+      password: data.password,
     });
 
-    if (result.status !== 200) {
-      toast.
+    if (error) {
+      toast.add({
+        type: "error",
+        description: error.message || "Login failed",
+      });
+
+      return;
     }
+
+    navigate("/organizations", { replace: true });
   };
 
   return (
@@ -58,7 +65,7 @@ export const Login = () => {
                 {...register("email")}
               />
               {errors.email && (
-                <span className="text-red-400">errors.name.message</span>
+                <span className="text-red-400">errors.email.message</span>
               )}
             </div>
             <div className="grid gap-2">
