@@ -9,7 +9,8 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Spinner } from "./components/ui/spinner";
 import { authClient } from "./lib/auth-client";
 import { MainLayout } from "./layout/MainLayout";
-import { Organization } from "./pages/Organization";
+import { Organizations } from "./pages/Organization";
+import { NotFound } from "./pages/NotFound";
 
 function App() {
   const { isPending } = authClient.useSession();
@@ -49,10 +50,13 @@ function App() {
         {/* Only authenticated users */}
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
-            <Route path="/organizations" element={<Organization />} />
+            <Route path="/organizations" element={<Organizations />} />
             <Route path="/boards/:boardID" element={<Board />} />
           </Route>
         </Route>
+
+        {/* Not Found */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   );
