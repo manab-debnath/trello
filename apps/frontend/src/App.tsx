@@ -11,6 +11,7 @@ import { authClient } from "./lib/auth-client";
 import { MainLayout } from "./layout/MainLayout";
 import { Organizations } from "./pages/Organization";
 import { NotFound } from "./pages/NotFound";
+import { Profile } from "./pages/Profile";
 
 function App() {
   const { isPending } = authClient.useSession();
@@ -51,6 +52,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
             <Route path="/organizations" element={<Organizations />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/boards/:boardID" element={<Board />} />
           </Route>
         </Route>

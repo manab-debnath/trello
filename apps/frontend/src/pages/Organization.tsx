@@ -1,3 +1,4 @@
+import { Loading } from "@/components/Loading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +17,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Spinner } from "@/components/ui/spinner";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Ellipsis, PencilIcon, ShareIcon, TrashIcon } from "lucide-react";
@@ -39,11 +39,7 @@ export const Organizations = () => {
   useEffect(() => console.log(data), [data]);
 
   if (isPending) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center">
-        <Spinner />
-      </div>
-    );
+    return <Loading />;
   }
   if (error) {
     console.error(error);

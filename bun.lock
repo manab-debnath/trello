@@ -23,6 +23,7 @@
         "better-auth": "^1.7.7",
         "class-variance-authority": "^0.7.1",
         "cn": "^0.4.0",
+        "db": "*",
         "lucide-react": "^1.56.0",
         "react": "^19.2.8",
         "react-dom": "^19.2.8",

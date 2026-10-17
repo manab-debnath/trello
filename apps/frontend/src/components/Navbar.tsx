@@ -49,7 +49,10 @@ export const Navbar = () => {
         />
         <DropdownMenuContent align="end">
           <DropdownMenuGroup>
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => navigate("/profile")}
+            >
               <UserIcon />
               Profile
             </DropdownMenuItem>

@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
-
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@/components/ui/toast";
-
 import {
   Card,
   CardContent,
@@ -16,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Spinner } from "@/components/ui/spinner";
 
 import {
   AlertDialog,
@@ -28,9 +25,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
-type SessionData = typeof authClient.$Infer.Session;
-type User = SessionData["user"];
+import { ArrowLeft } from "lucide-react";
+import { Loading } from "@/components/Loading";
 
 type ProfileInputs = {
   name: string;
@@ -46,7 +42,7 @@ type DeleteInputs = {
   password: string;
 };
 
-export default function Profile() {
+export const Profile = () => {
   const navigate = useNavigate();
 
   const {
@@ -55,7 +51,7 @@ export default function Profile() {
     refetch,
   } = authClient.useSession();
 
-  const user: User | null = session?.user ?? null;
+  const user = session?.user;
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
@@ -174,11 +170,7 @@ export default function Profile() {
   };
 
   if (sessionPending) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Spinner />
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!user) {
@@ -191,6 +183,18 @@ export default function Profile() {
 
   return (
     <main className="mx-auto w-full max-w-3xl space-y-6 p-4 py-10 md:p-8">
+      <button
+        className="group flex items-center gap-2 rounded-md p-2 cursor-pointer hover:bg-gray-100 transition-colors"
+        onClick={() => navigate(-1)}
+      >
+        <ArrowLeft
+          size={16}
+          className="rounded-full transition-transform duration-200 group-hover:-translate-x-1"
+        />
+        <h4 className="font-medium transition-colors duration-200 group-hover:text-gray-700">
+          Home
+        </h4>
+      </button>
       {/* Page heading */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Profile settings</h1>
@@ -438,4 +442,4 @@ export default function Profile() {
       </Card>
     </main>
   );
-}
+};
