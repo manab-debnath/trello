@@ -14,6 +14,7 @@ export {
   createOrganization,
   getAllOrganizations,
   getOrganizationById,
+  updateOrganizationById,
   deleteOrganizationById,
   sendInvitation,
   removeUserFromOrganization,

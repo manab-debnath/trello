@@ -127,6 +127,60 @@ const getOrganizationById = async (
   }
 };
 
+const updateOrganizationById = async (
+  req: Request<{ orgID: string }>,
+  res: Response,
+) => {
+  const { orgID } = req.params;
+  const { name, description } = req.body;
+
+  if (!orgID) {
+    return res.status(400).json({ message: "Organization ID is required" });
+  }
+
+  if (!name && !description) {
+    return res.status(400).json({ message: "Missing Fields" });
+  }
+
+  try {
+    const organization = await prisma.organization.update({
+      where: {
+        id: orgID,
+      },
+      data: {
+        name,
+        description,
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        organization_users: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!organization) {
+      return res.status(404).json({ message: "Organization not found" });
+    }
+
+    logger.info("Organization updated successfully");
+    return res.status(200).json(organization);
+  } catch (error) {
+    logger.error({ error }, "Error updating organization");
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const deleteOrganizationById = async (
   req: Request<{ orgID: string }>,
   res: Response,
@@ -249,7 +303,7 @@ const removeUserFromOrganization = async (
   res: Response,
 ) => {
   const { orgID } = req.params;
-  const { userIDs } = req.body; 
+  const { userIDs } = req.body;
 
   if (!Array.isArray(userIDs) || userIDs.length === 0) {
     return res.status(400).json({ message: "No users to remove" });
@@ -366,6 +420,7 @@ export {
   createOrganization,
   getAllOrganizations,
   getOrganizationById,
+  updateOrganizationById,
   deleteOrganizationById,
   sendInvitation,
   removeUserFromOrganization,

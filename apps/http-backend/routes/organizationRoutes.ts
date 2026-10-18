@@ -4,6 +4,7 @@ import {
 	deleteOrganizationById,
 	getAllOrganizations,
 	getOrganizationById,
+  updateOrganizationById,
 	leaveOrganization,
 	removeUserFromOrganization,
 	sendInvitation,
@@ -23,6 +24,12 @@ organizationRouter.get(
 	"/:orgID",
 	requireOrganizationRole(Role.ADMIN, Role.MEMBER),
 	getOrganizationById,
+);
+
+organizationRouter.patch(
+	"/:orgID",
+	requireOrganizationRole(Role.ADMIN),
+	updateOrganizationById,
 );
 
 organizationRouter.delete(
