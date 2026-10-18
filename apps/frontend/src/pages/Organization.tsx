@@ -219,12 +219,12 @@ export const Organizations = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </CardAction>
-                <CardTitle>{data[0].organization.name}</CardTitle>
+                <CardTitle>{organization.name}</CardTitle>
                 <CardDescription>
                   {/* 70 characters */}
-                  {data[0].organization.description.length > 70
-                    ? `${data[0].organization.description.slice(0, 70)}...`
-                    : data[0].organization.description}
+                  {organization.description.length > 70
+                    ? `${organization.description.slice(0, 70)}...`
+                    : organization.description}
                 </CardDescription>
               </CardHeader>
               <CardFooter>

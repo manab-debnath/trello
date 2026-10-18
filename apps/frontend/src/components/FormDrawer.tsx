@@ -124,13 +124,13 @@ export const FormDrawer = ({
                 id="organization-description"
                 placeholder="Describe your organization"
                 className="h-32 resize-none"
-                maxLength={100}
+                maxLength={250}
                 {...register("description", {
                   required: "Description is required",
                   validate: (value) =>
                     value.trim().length > 0 || "Description cannot be empty",
                   maxLength: {
-                    value: 100,
+                    value: 250,
                     message: "Description cannot exceed 100 characters",
                   },
                 })}
