@@ -23,12 +23,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/toast";
+import { apiURL } from "@/utils/constants";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Ellipsis, PencilIcon, Plus, ShareIcon, TrashIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const apiURL = import.meta.env.VITE_API_URL;
 
 type OrganizationMembership = {
   organization: Organization;
