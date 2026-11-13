@@ -27,7 +27,7 @@ import { apiURL } from "@/utils/constants";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Ellipsis, PencilIcon, Plus, ShareIcon, TrashIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 
 type OrganizationMembership = {
@@ -146,7 +146,6 @@ export const Organizations = () => {
     }
   };
 
-  useEffect(() => console.log(data), [data]);
 
   if (isPending) {
     return <Loading />;
